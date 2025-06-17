@@ -1,38 +1,82 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
-export default function NavbarDesktop() {
+const Navbar = ({ navigation, active }) => {
+  const menuItems = [
+    { label: 'Home', route: 'Home' },
+    { label: 'Notificações', route: 'Notificações' },
+    { label: 'Vagas', route: 'SuggestedJobs' },
+    { label: 'Perfil', route: 'Perfil' },
+  ];
+
   return (
-    <View style={styles.nav}>
-      <Image source={require('../assets/logo.png')} style={styles.logo} />
-      <View style={styles.menu}>
-        <Text style={styles.item}>Home</Text>
-        <Text style={styles.item}>Vagas</Text>
-        <Text style={styles.item}>Perfil</Text>
+    <LinearGradient colors={['#0f172a', '#1d4ed8']} style={styles.navbar}>
+      <View style={styles.logoContainer}>
+        <Image
+          source={require('../assets/logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
       </View>
-    </View>
+
+      <View style={styles.menuContainer}>
+        {menuItems.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => navigation.navigate(item.route)}
+            style={styles.menuItem}
+          >
+            <Text style={[styles.menuText, active === item.route && styles.activeText]}>
+              {item.label}
+            </Text>
+            {active === item.route && <View style={styles.underline} />}
+          </TouchableOpacity>
+        ))}
+      </View>
+    </LinearGradient>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  nav: {
+  navbar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 20,
-    backgroundColor: '#1d4ed8',
     alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  logoContainer: {
+    flex: 1,
   },
   logo: {
-    height: 40,
-    resizeMode: 'contain',
+    width: 140,
+    height: 60,
   },
-  menu: {
+  menuContainer: {
     flexDirection: 'row',
-    gap: 20,
+    flex: 2,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
   },
-  item: {
-    color: '#fff',
-    fontWeight: 'bold',
+  menuItem: {
+    marginLeft: 40,
+    alignItems: 'center',
+  },
+  menuText: {
+    color: '#ffffffcc',
     fontSize: 16,
+    fontWeight: '500',
+  },
+  activeText: {
+    color: '#fff',
+  },
+  underline: {
+    marginTop: 4,
+    height: 2,
+    width: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 1,
   },
 });
+
+export default Navbar;
