@@ -2,11 +2,55 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import AuthLayout from '../components/AuthLayout';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Alert } from 'react-native';
+import { API_BASE_URL } from '../config'; 
+
 
 export default function UpdatePasswordScreen({ navigation }) {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const handleUpdatePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      Alert.alert("Erro", "Preencha todos os campos.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      Alert.alert("Erro", "As senhas não coincidem.");
+      return;
+    }
+
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      const response = await axios.put(
+        `${API_BASE_URL}/usuario/alterar-senha`,
+        {
+          senhaAtual: currentPassword,
+          novaSenha: newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      Alert.alert("Sucesso", "Senha atualizada com sucesso!");
+      navigation.goBack();
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+      Alert.alert(
+        "Erro",
+        "Falha ao atualizar a senha. Verifique a senha atual."
+      );
+    }
+  };
 
   return (
     <AuthLayout>
@@ -40,13 +84,7 @@ export default function UpdatePasswordScreen({ navigation }) {
           onChangeText={setConfirmPassword}
         />
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            alert('Senha atualizada com sucesso!');
-            navigation.goBack();
-          }}
-        >
+        <TouchableOpacity style={styles.button} onPress={handleUpdatePassword}>
           <Text style={styles.buttonText}>Atualizar senha</Text>
         </TouchableOpacity>
       </View>

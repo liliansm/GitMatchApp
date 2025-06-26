@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import AuthLayout from '../components/AuthLayout';
+import { cadastrar } from '../service/authService';
+import { Alert } from 'react-native';
 
 export default function RegisterScreen({ navigation }) {
   const [form, setForm] = useState({
@@ -20,6 +22,29 @@ export default function RegisterScreen({ navigation }) {
 
   const handleChange = (name, value) => setForm({ ...form, [name]: value });
 
+  const handleRegister = async () => {
+    if (form.senha !== form.confirma) {
+      return Alert.alert('Erro', 'As senhas não coincidem');
+    }
+
+    const payload = {
+      nome: form.nome,
+      email: form.email,
+      senha: form.senha,
+      tipoUsuario: 'CANDIDATO',
+      githubUsername: form.github,
+    };
+
+    try {
+      const userData = await cadastrar(payload);
+      console.log('Usuário cadastrado:', userData);
+      navigation.navigate('Login'); 
+    } catch (error) {
+      console.error('Erro no cadastro:', error.response?.data || error.message);
+      Alert.alert('Erro no cadastro', 'Verifique os dados e tente novamente.');
+    }
+  };
+
   return (
     <AuthLayout
       title="Olá"
@@ -27,7 +52,7 @@ export default function RegisterScreen({ navigation }) {
       button={
         <TouchableOpacity
           style={styles.entrarButton}
-          onPress={() => navigation.navigate('Home')}
+          onPress={handleRegister}
         >
           <Text style={styles.entrarButtonText}>Criar conta</Text>
         </TouchableOpacity>

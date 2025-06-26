@@ -8,10 +8,31 @@ import {
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import AuthLayout from '../components/AuthLayout';
+import { login } from '../service/authService';
+import { Alert } from 'react-native';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    if (!email || !senha) {
+      console.log('Erro', 'Preencha e-mail e senha');
+      return;
+    }
+    setLoading(true);
+    try {
+      const data = await login({ email, senha }); 
+      console.log('Login bem-sucedido:',data);
+      navigation.navigate('UpdatePassword');
+    } catch (error) {
+      
+      console.log('Erro', 'E-mail ou senha inválidos');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <AuthLayout
@@ -20,9 +41,13 @@ export default function LoginScreen({ navigation }) {
       button={
         <TouchableOpacity
           style={styles.entrarButton}
-          onPress={() => navigation.navigate('Home')}
+          onPress={handleLogin}
+          disabled={loading}
         >
-          <Text style={styles.entrarButtonText}>Entrar</Text>
+          
+          <Text style={styles.entrarButtonText}>
+            {loading ? 'Entrando...' : 'Entrar'}
+          </Text>
         </TouchableOpacity>
       }
     >
