@@ -1,12 +1,17 @@
-// UpdatePasswordScreen.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import AuthLayout from '../components/AuthLayout';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Alert } from 'react-native';
-import { API_BASE_URL } from '../config'; 
-
+import { API_BASE_URL } from '../config';
+import { Ionicons } from '@expo/vector-icons'; // Certifique-se de instalar: expo install @expo/vector-icons
 
 export default function UpdatePasswordScreen({ navigation }) {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -27,7 +32,7 @@ export default function UpdatePasswordScreen({ navigation }) {
     try {
       const token = await AsyncStorage.getItem("token");
 
-      const response = await axios.put(
+      await axios.put(
         `${API_BASE_URL}/usuario/alterar-senha`,
         {
           senhaAtual: currentPassword,
@@ -45,17 +50,20 @@ export default function UpdatePasswordScreen({ navigation }) {
       navigation.goBack();
     } catch (error) {
       console.error(error.response?.data || error.message);
-      Alert.alert(
-        "Erro",
-        "Falha ao atualizar a senha. Verifique a senha atual."
-      );
+      Alert.alert("Erro", "Falha ao atualizar a senha. Verifique a senha atual.");
     }
   };
 
   return (
     <AuthLayout>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="#1d4ed8" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Atualizar Senha</Text>
+      </View>
+
       <View style={styles.container}>
-        <Text style={styles.title}>Atualizar Senha</Text>
         <Text style={styles.subtitle}>
           Para sua segurança, confirme sua senha atual antes de atualizar.
         </Text>
@@ -84,7 +92,16 @@ export default function UpdatePasswordScreen({ navigation }) {
           onChangeText={setConfirmPassword}
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleUpdatePassword}>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            (!currentPassword || !newPassword || !confirmPassword || newPassword !== confirmPassword) && styles.buttonDisabled
+          ]}
+          onPress={handleUpdatePassword}
+          disabled={
+            !currentPassword || !newPassword || !confirmPassword || newPassword !== confirmPassword
+          }
+        >
           <Text style={styles.buttonText}>Atualizar senha</Text>
         </TouchableOpacity>
       </View>
@@ -93,14 +110,19 @@ export default function UpdatePasswordScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 20,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    gap: 12,
   },
-  title: {
-    fontSize: 22,
+  headerTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 12,
-    textAlign: 'center',
+    color: '#1d4ed8',
+  },
+  container: {
+    paddingHorizontal: 8,
   },
   subtitle: {
     fontSize: 14,
@@ -114,13 +136,16 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 6,
     marginBottom: 16,
+    backgroundColor: '#fff',
   },
   button: {
     backgroundColor: '#1d4ed8',
     paddingVertical: 12,
-    paddingHorizontal: 24,
     borderRadius: 6,
     alignItems: 'center',
+  },
+  buttonDisabled: {
+    backgroundColor: '#9bbcf2',
   },
   buttonText: {
     color: 'white',

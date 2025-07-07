@@ -1,132 +1,120 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, useWindowDimensions, TouchableOpacity } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons'; // ou 'react-native-vector-icons/MaterialIcons'
+import { MaterialIcons } from '@expo/vector-icons';
 import { useFonts, Poly_400Regular } from '@expo-google-fonts/poly';
 
 export default function HeroSection({ navigation }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
 
-  const [fontsLoaded] = useFonts({
-    Poly_400Regular,
-  });
-
+  const [fontsLoaded] = useFonts({ Poly_400Regular });
   if (!fontsLoaded) return null;
 
   return (
-    <View style={[styles.container, isDesktop && styles.desktopContainer]}>
-      <View style={[styles.textContainer, isDesktop && styles.textContainerDesktop]}>
-        <Text style={[styles.title, isDesktop && styles.titleDesktop]}>
-          Conectamos você à vaga ideal através do seu GitHub
+    <View style={styles.wrapper}>
+      {/* Texto principal */}
+      <View style={styles.hero}>
+        <Text style={styles.title}>
+          Conecte-se com a vaga ideal através do seu GitHub
         </Text>
 
-        <Text style={[styles.subtitle, isDesktop && styles.subtitleDesktop]}>
-          No GitMatch, analisamos suas habilidades, projetos e linguagens favoritas para encontrar as melhores oportunidades para o seu perfil.
+        <Text style={styles.subtitle}>
+          O GitMatch analisa suas habilidades e projetos para te recomendar oportunidades com base no seu perfil técnico.
         </Text>
 
+        {/* Etapas / Benefícios */}
         <View style={styles.featuresList}>
-          <View style={styles.featureItem}>
-            <MaterialIcons name="insights" size={20} color="#1d4ed8" />
-            <Text style={styles.featureText}>Análises inteligentes</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <MaterialIcons name="update" size={20} color="#1d4ed8" />
-            <Text style={styles.featureText}>Vagas atualizadas</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <MaterialIcons name="person-search" size={20} color="#1d4ed8" />
-            <Text style={styles.featureText}>Match com recrutadores</Text>
-          </View>
+          <Feature icon="insights" label="Análises técnicas automáticas" />
+          <Feature icon="update" label="Vagas sempre atualizadas" />
+          <Feature icon="person-search" label="Conexão com recrutadores reais" />
         </View>
 
         <TouchableOpacity
-          style={styles.verifyButton}
-          onPress={() => navigation && navigation.navigate('Perfil')}
+          style={styles.button}
+          onPress={() => navigation?.navigate('Login')}
         >
-          <Text style={styles.verifyButtonText}>Visualizar Perfil</Text>
+          <Text style={styles.buttonText}>Entre agora</Text>
         </TouchableOpacity>
       </View>
-
-      <View style={styles.imageContainer}>
+      {!isDesktop && (
         <Image
           source={require('../assets/img1Home.png')}
-          style={styles.home1}
+          style={styles.image}
           resizeMode="contain"
         />
-      </View>
+      )}
+    </View>
+  );
+}
+
+function Feature({ icon, label }) {
+  return (
+    <View style={styles.featureItem}>
+      <MaterialIcons name={icon} size={22} color="#1d4ed8" />
+      <Text style={styles.featureLabel}>{label}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'column',
-    alignItems: 'center',
+  wrapper: {
     paddingHorizontal: 20,
     paddingVertical: 40,
-    gap: 20,
+    backgroundColor: '#ffffff',
   },
-  desktopContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 50,
-  },
-  textContainer: {
+  hero: {
     alignItems: 'center',
-    maxWidth: 600,
-  },
-  textContainerDesktop: {
-    alignItems: 'flex-start',
+    gap: 16,
   },
   title: {
-    fontSize: 26,
-    fontFamily: 'Poly_400Regular',
+    fontSize: 24,
+    fontWeight: 'bold',
     color: '#0f172a',
     textAlign: 'center',
-  },
-  titleDesktop: {
-    textAlign: 'left',
-    fontSize: 30,
+    lineHeight: 32,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#475569',
-    marginTop: 10,
     textAlign: 'center',
-  },
-  subtitleDesktop: {
-    textAlign: 'left',
+    lineHeight: 22,
   },
   featuresList: {
+    width: '100%',
     marginTop: 20,
-    gap: 10,
+    gap: 12,
   },
   featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-  },
-  featureText: {
-    fontSize: 16,
-    color: '#0f172a',
-  },
-  verifyButton: {
-    marginTop: 20,
-    backgroundColor: '#1d4ed8',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
+    backgroundColor: '#f1f5f9',
+    padding: 12,
     borderRadius: 8,
   },
-  verifyButtonText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 16,
+  featureLabel: {
+    fontSize: 15,
+    color: '#1e293b',
+    flex: 1,
+    flexWrap: 'wrap',
   },
-  imageContainer: {
-    alignItems: 'center',
+  button: {
+    marginTop: 24,
+    backgroundColor: '#1d4ed8',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 30,
+    elevation: 3,
   },
-  home1: {
-    width: 440,
-    height: 440,
+  buttonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  image: {
+    width: '100%',
+    height: 220,
+    marginTop: 24,
+    alignSelf: 'center',
   },
 });

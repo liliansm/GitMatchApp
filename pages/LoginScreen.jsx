@@ -25,7 +25,7 @@ export default function LoginScreen({ navigation }) {
     try {
       const data = await login({ email, senha }); 
       console.log('Login bem-sucedido:',data);
-      navigation.navigate('UpdatePassword');
+      navigation.navigate('Profile');
     } catch (error) {
       
       console.log('Erro', 'E-mail ou senha inválidos');
