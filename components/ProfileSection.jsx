@@ -22,7 +22,10 @@ export default function ProfileSection({ user }) {
           <Text style={styles.username}>@{user.username}</Text>
           <Text style={styles.title}>{user.title}</Text>
 
-          <TouchableOpacity style={styles.analysisButton}>
+          <TouchableOpacity
+            style={styles.analysisButton}
+            onPress={() => navigation.navigate('PainelVagas')}
+          >
             <Text style={styles.analysisButtonText}>Ver Análise</Text>
           </TouchableOpacity>
         </View>

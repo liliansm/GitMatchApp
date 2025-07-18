@@ -49,8 +49,11 @@ export default function HomeScreen({ navigation }) {
                 <TouchableOpacity style={styles.menuItem} onPress={() => handleNavigate('Profile')}>
                   <Text style={styles.menuText}>Perfil</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.menuItem} onPress={() => handleNavigate('Vagas')}>
+                <TouchableOpacity style={styles.menuItem} onPress={() => handleNavigate('PainelVagas')}>
                   <Text style={styles.menuText}>Vagas</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.menuItem} onPress={() => handleNavigate('Notification')}>
+                  <Text style={styles.menuText}>Notificações</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
                   <Text style={styles.menuText}>Sair</Text>

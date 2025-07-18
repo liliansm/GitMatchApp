@@ -19,10 +19,11 @@ import EditCompanyProfileScreen from './pages/EditCompanyProfileScreen';
 import SuggestedJobsScreen from './pages/SuggestedJobsScreen';
 import JobMatchScreen from './pages/JobMatchScreen';
 import RHMatchScreen from './pages/RHMatchScreen';
-// import PainelVagasScreen from './pages/PainelVagasScreen';
+import PainelVagasScreen from './pages/PainelVagasScreen';
 import NotificationScreen from './pages/NotificationScreen';
 import CriarVagaScreen from './pages/CriarVagaScreen';
 import SettingsScreen from './pages/SettingsScreen';
+import DetalhesVagaScreen from './pages/DetalhesVagaScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -30,7 +31,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName="PainelVagas" screenOptions={{ headerShown: false }}>
         {/* Autenticação */}
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
@@ -51,7 +52,8 @@ export default function App() {
         <Stack.Screen name="CriarVaga" component={CriarVagaScreen} />
         <Stack.Screen name="Notification" component={NotificationScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
-        {/* <Stack.Screen name="PainelVagas" component={PainelVagasScreen} /> */}
+        <Stack.Screen name="PainelVagas" component={PainelVagasScreen} />
+        <Stack.Screen name="DetalhesVaga" component={DetalhesVagaScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

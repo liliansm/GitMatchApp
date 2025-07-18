@@ -1,115 +1,237 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Button } from 'react-native-elements';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  Pressable,
+  Animated,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-const JobMatch = ({ title, percentage, skills }) => (
-  <View style={styles.container}>
-    <Text style={styles.title}>{title}</Text>
+export default function JobMatch({ title, company, skills, percentage }) {
+  const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
 
-    <View style={styles.circleContainer}>
-      <View style={styles.circle}>
-        <Text style={styles.percentText}>{percentage}%</Text>
+  const progress = React.useRef(new Animated.Value(0)).current;
+
+  React.useEffect(() => {
+    Animated.timing(progress, {
+      toValue: percentage,
+      duration: 1000,
+      useNativeDriver: false,
+    }).start();
+  }, [percentage]);
+
+  const widthInterpolated = progress.interpolate({
+    inputRange: [0, 100],
+    outputRange: ['0%', '100%'],
+  });
+
+  const handleCandidatar = () => {
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    navigation.navigate('Profile');  // Navega para Profile ao fechar modal
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.company}>{company}</Text>
+
+      <View style={styles.matchContainer}>
+        <Text style={styles.matchLabel}>Seu Match</Text>
+        <Text style={styles.matchPercent}>{percentage}%</Text>
       </View>
-      <Text style={styles.matchLabel}>Compatibilidade</Text>
-    </View>
 
-    <Text style={styles.subtitle}>
-      Você tem {percentage}% de compatibilidade com esta vaga
-    </Text>
+      <View style={styles.progressBarBackground}>
+        <Animated.View
+          style={[
+            styles.progressBarFill,
+            {
+              width: widthInterpolated,
+              backgroundColor: '#3b82f6', // azul fixo
+            },
+          ]}
+        />
+      </View>
 
-    <View style={styles.skillsContainer}>
-      {skills.map((skill, i) => (
-        <View key={i} style={styles.skillTag}>
-          <Text style={styles.skillText}>{skill}</Text>
+      <View style={styles.skillsContainer}>
+        {skills.map((skill, index) => (
+          <View key={index} style={styles.skillBadge}>
+            <Text style={styles.skillText}>#{skill}</Text>
+          </View>
+        ))}
+      </View>
+
+      <TouchableOpacity style={styles.button} onPress={handleCandidatar} activeOpacity={0.8}>
+        <Text style={styles.buttonText}>Candidatar-se</Text>
+      </TouchableOpacity>
+
+      {/* Modal */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={handleCloseModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalEmoji}>✅🎉</Text>
+            <Text style={styles.modalTitle}>Candidatura enviada!</Text>
+            <Text style={styles.modalText}>
+              🚀 Boa sorte! A empresa vai analisar seu perfil.
+            </Text>
+            <Pressable
+              style={styles.modalButton}
+              onPress={handleCloseModal}
+            >
+              <Text style={styles.modalButtonText}>Fechar</Text>
+            </Pressable>
+          </View>
         </View>
-      ))}
+      </Modal>
     </View>
-
-    <Button
-      title="Candidatar-se"
-      buttonStyle={styles.applyButton}
-      titleStyle={styles.applyText}
-    />
-  </View>
-);
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    gap: 14,
     padding: 24,
-    borderRadius: 16,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
+    backgroundColor: '#fff',
+    borderRadius: 22,
+    elevation: 4,
+    shadowColor: '#00000022',
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
   },
   title: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 22,
+    fontWeight: '700',
     color: '#1e293b',
-    marginBottom: 16,
     textAlign: 'center',
   },
-  circleContainer: {
-    alignItems: 'center',
-    marginBottom: 16,
+  company: {
+    fontSize: 16,
+    color: '#64748b',
+    textAlign: 'center',
+    marginBottom: 12,
   },
-  circle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#dbeafe',
+  matchContainer: {
+    flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 4,
-    borderColor: '#1d4ed8',
-  },
-  percentText: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1d4ed8',
+    alignItems: 'baseline',
+    gap: 6,
+    marginBottom: 6,
   },
   matchLabel: {
-    marginTop: 8,
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: '600',
     color: '#64748b',
   },
-  subtitle: {
-    fontSize: 14,
-    color: '#334155',
-    marginBottom: 20,
-    textAlign: 'center',
+  matchPercent: {
+    fontSize: 36,
+    fontWeight: '900',
+    color: '#3b82f6', // azul vibrante
+  },
+  progressBarBackground: {
+    width: '100%',
+    height: 10,
+    backgroundColor: '#e2e8f0',
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginBottom: 14,
+  },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 10,
   },
   skillsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 8,
-    marginBottom: 24,
+    gap: 10,
+    marginBottom: 20,
   },
-  skillTag: {
-    backgroundColor: '#e2e8f0',
+  skillBadge: {
+    backgroundColor: '#f0f9ff',
+    borderRadius: 16,
     paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    margin: 4,
+    paddingHorizontal: 14,
   },
   skillText: {
-    fontSize: 13,
-    color: '#1e293b',
-  },
-  applyButton: {
-    backgroundColor: '#1d4ed8',
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    width: '100%',
-  },
-  applyText: {
-    fontSize: 16,
+    color: '#3b82f6',
     fontWeight: '600',
+    fontSize: 14,
+  },
+  button: {
+    backgroundColor: '#3b82f6',
+    paddingVertical: 14,
+    borderRadius: 30,
+    alignItems: 'center',
+    elevation: 4,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+
+  // Modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 25,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 25,
+    paddingVertical: 35,
+    paddingHorizontal: 30,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 350,
+    elevation: 15,
+    shadowColor: '#00000055',
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
+    shadowOffset: { width: 0, height: 6 },
+  },
+  modalEmoji: {
+    fontSize: 42,
+    marginBottom: 15,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1e293b',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#475569',
+    textAlign: 'center',
+    marginBottom: 25,
+  },
+  modalButton: {
+    backgroundColor: '#3b82f6',
+    paddingVertical: 12,
+    paddingHorizontal: 36,
+    borderRadius: 24,
+    elevation: 5,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
   },
 });
-
-export default JobMatch;
