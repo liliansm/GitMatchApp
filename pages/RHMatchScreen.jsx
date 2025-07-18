@@ -1,5 +1,7 @@
+// RHMatchScreen.js
 import React from 'react';
-import { View, Text, Image, StyleSheet, FlatList, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const candidatos = [
   {
@@ -8,69 +10,63 @@ const candidatos = [
     cargo: 'Engenharia de Software',
     match: '85%',
     foto: { uri: 'https://randomuser.me/api/portraits/women/44.jpg' },
+    habilidades: ['React', 'Node.js', 'PostgreSQL'],
+    experiencia: '3 anos na empresa X',
   },
-  { 
-    id: '2', 
-    nome: 'Carlos Silva', 
-    cargo: 'Analista de Dados', 
-    match: '85%', 
-    foto: { uri: 'https://randomuser.me/api/portraits/men/32.jpg' } 
+  {
+    id: '2',
+    nome: 'Carlos Silva',
+    cargo: 'Analista de Dados',
+    match: '85%',
+    foto: { uri: 'https://randomuser.me/api/portraits/men/32.jpg' },
+    habilidades: ['Python', 'SQL', 'Power BI'],
+    experiencia: '2 anos na empresa Y',
   },
-  { 
-    id: '3', 
-    nome: 'Luana Marques', 
-    cargo: 'Dev FrontEnd', 
-    match: '85%', 
-    foto: { uri: 'https://randomuser.me/api/portraits/women/68.jpg' } 
-  },
-  { 
-    id: '4', 
-    nome: 'Jorge Lima', 
-    cargo: 'Dev BackEnd', 
-    match: '85%', 
-    foto: { uri: 'https://randomuser.me/api/portraits/men/75.jpg' } 
-  },
+  // Adicione mais candidatos se quiser
 ];
 
-const RHMatchScreen = () => (
-  <View style={styles.container}>
-    <Text style={styles.title}>Engenheiro(a) de Software</Text>
-    
-    {/* Container branco com bordas arredondadas no topo */}
-    <View style={styles.whiteContainer}>
-      <FlatList
-        data={candidatos}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Image source={item.foto} style={styles.avatar} />
-            <View style={styles.info}>
-              <Text style={styles.nome}>{item.nome}</Text>
-              <Text style={styles.cargo}>{item.cargo}</Text>
-            </View>
-            <View style={styles.matchCircle}>
-              <Text style={styles.matchText}>{item.match}</Text>
-              <Text style={styles.matchLabel}>match</Text>
-            </View>
-          </View>
-        )}
-      />
+export default function RHMatchScreen() {
+  const navigation = useNavigation();
+
+  const abrirDetalhes = (candidato) => {
+    navigation.navigate('CandidatoDetalhes', { candidato });
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Engenheiro(a) de Software</Text>
+      <View style={styles.whiteContainer}>
+        <FlatList
+          data={candidatos}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.card} onPress={() => abrirDetalhes(item)}>
+              <Image source={item.foto} style={styles.avatar} />
+              <View style={styles.info}>
+                <Text style={styles.nome}>{item.nome}</Text>
+                <Text style={styles.cargo}>{item.cargo}</Text>
+              </View>
+              <View style={styles.matchCircle}>
+                <Text style={styles.matchText}>{item.match}</Text>
+                <Text style={styles.matchLabel}>match</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
     </View>
-  </View>
-);
+  );
+}
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: '#eef3f9',
-  },
-  title: { 
+  container: { flex: 1, backgroundColor: '#eef3f9' },
+  title: {
     fontSize: 22,
     fontWeight: 'bold',
     marginVertical: 24,
     marginLeft: 24,
-    color: '#1a1a1a'
+    color: '#1a1a1a',
   },
   whiteContainer: {
     flex: 1,
@@ -78,7 +74,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingTop: 24,
-    marginTop: 20, // Começa após o meio da tela
+    marginTop: 20,
   },
   listContent: {
     paddingHorizontal: 24,
@@ -132,5 +128,3 @@ const styles = StyleSheet.create({
     color: '#666',
   },
 });
-
-export default RHMatchScreen;

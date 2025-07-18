@@ -95,9 +95,6 @@ export default function NotificationsScreen() {
           <Text style={styles.viewMoreText}>Ver mais notificações</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteAccount}>
-          <Text style={styles.deleteButtonText}>Excluir conta</Text>
-        </TouchableOpacity>
       </ScrollView>
 
       <NavigationMenu />
