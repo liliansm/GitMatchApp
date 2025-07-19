@@ -1,18 +1,54 @@
-import React, { useState } from 'react';
+import React, { useEffect,useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import AuthLayout from '../components/AuthLayout';
+import axios from 'axios';
+import { API_BASE_URL } from '../config';
+import { Alert } from 'react-native';
 
-export default function NewPasswordScreen({ navigation }) {
+export default function NewPasswordScreen({ navigation,route }) {
+  const [email, setEmail] = useState('');
+  const [code, setCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [subtitle, setSubtitle] = useState('Digite a nova senha e confirme para atualizar sua conta.');
+
+
+  useEffect(() => {
+        setEmail(route.params.email); // Armazena o e-mail da tela anterior
+        setCode(route.params.codigo); // Armazena o código da tela anterior
+      
+    }, []);
+
+
+    const alterarSenha = async () => {
+
+
+    if(newPassword !== confirmPassword) {
+      setSubtitle('As senhas não coincidem. Tente novamente.');
+    }else{
+      setSubtitle('Alterando senha, aguarde...');
+      await axios.post(`${API_BASE_URL}/email/trocar-senha`, { email: email, codigo: code, novaSenha: newPassword }).then(response => {
+        console.log('Senha alterada com sucesso:', response.data);
+        Alert.alert('Sucesso', 'Senha alterada com sucesso!');
+        setSubtitle('Senha alterada com sucesso!');
+        navigation.navigate('Login'); // Navega para a tela de login
+      }).catch(error => {
+        console.error('Erro ao alterar senha:', error.response?.data || error.message);
+        Alert.alert('Erro', 'Falha ao alterar senha. Verifique o código e tente novamente.');
+      });
+
+    }
+   
+    } 
 
   return (
     <AuthLayout>
       <View style={styles.container}>
         <Text style={styles.title}>Nova Senha</Text>
-        <Text style={styles.subtitle}>
-          Digite a nova senha e confirme para atualizar sua conta.
+        <Text style={[styles.subtitle, subtitle === 'As senhas não coincidem. Tente novamente.' && { color: 'red',fontWeight: 'bold'  }]}>
+          {subtitle}
         </Text>
+    
 
         <TextInput
           placeholder="Nova senha"
@@ -32,10 +68,7 @@ export default function NewPasswordScreen({ navigation }) {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => {
-            alert('Senha redefinida com sucesso!');
-            navigation.navigate('Login');
-          }}
+          onPress={alterarSenha}
         >
           <Text style={styles.buttonText}>Salvar nova senha</Text>
         </TouchableOpacity>

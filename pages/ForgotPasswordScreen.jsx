@@ -7,9 +7,37 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import AuthLayout from '../components/AuthLayout';
+import axios from 'axios';
+import{API_BASE_URL} from '../config';
+import { Alert } from 'react-native';
+
 
 export default function ForgotPasswordScreen({ navigation }) {
+  const [isSending, setIsSending] = useState(false);
+  const api_url = API_BASE_URL + '/email'
   const [email, setEmail] = useState('');
+
+  const enviarCodigo = async () => {
+  if (!email.trim()) {
+    Alert.alert('Erro', 'Por favor, digite um e-mail válido.');
+    return;
+  }
+
+  if (isSending) return; 
+
+  setIsSending(true);
+
+  try {
+    await axios.post(`${API_BASE_URL}/email/enviar-codigo`, { to: email });
+    Alert.alert('Sucesso', 'Código enviado com sucesso!');
+    navigation.navigate('ResetCode', { email });
+  } catch (err) {
+    Alert.alert('Erro', err.response?.data || 'Erro ao enviar código');
+  } finally {
+    setIsSending(false); 
+  }
+};
+
 
   return (
     <AuthLayout>
@@ -27,11 +55,14 @@ export default function ForgotPasswordScreen({ navigation }) {
         />
 
         <TouchableOpacity
-          style={styles.sendButton}
-          onPress={() => navigation.navigate('ResetCode')}
-        >
-          <Text style={styles.sendButtonText}>Enviar código</Text>
-        </TouchableOpacity>
+  style={[styles.sendButton, isSending && { opacity: 0.5 }]}
+  onPress={enviarCodigo}
+  disabled={isSending}
+>
+  <Text style={styles.sendButtonText}>
+    {isSending ? 'Enviando...' : 'Enviar código'}
+  </Text>
+</TouchableOpacity>
 
         <Text style={styles.backText} onPress={() => navigation.goBack()}>
           Voltar para login
@@ -40,6 +71,8 @@ export default function ForgotPasswordScreen({ navigation }) {
     </AuthLayout>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {

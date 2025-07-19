@@ -2,8 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; // ou 'react-native-vector-icons/MaterialIcons'
 import { useFonts, Poly_400Regular } from '@expo-google-fonts/poly';
-
-export default function HeroSection({ navigation }) {
+import { useNavigation } from '@react-navigation/native';
+export default function HeroSection() {
+  const navigation = useNavigation();
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
 
@@ -41,7 +42,7 @@ export default function HeroSection({ navigation }) {
 
         <TouchableOpacity
           style={styles.verifyButton}
-          onPress={() => navigation && navigation.navigate('Perfil')}
+          onPress={() =>navigation.navigate('Profile')}
         >
           <Text style={styles.verifyButtonText}>Visualizar Perfil</Text>
         </TouchableOpacity>

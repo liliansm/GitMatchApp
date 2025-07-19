@@ -11,6 +11,7 @@ import HomeScreen from './pages/HomeScreen';
 import JobMatchScreen from './pages/JobMatchScreen'; 
 import SuggestedJobsScreen from './pages/SuggestedJobsScreen';
 
+
 //Telas Matheus
 
 import ProfileScreen from './pages/ProfileScreen'
@@ -43,6 +44,7 @@ export default function App() {
         <Stack.Screen name="CriarVaga" component={CriarVagaScreen} />
         <Stack.Screen name="RHMatch" component={RHMatchScreen} />
         <Stack.Screen name="UpdatePassword" component={UpdatePasswordScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,9 +1,39 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity,Alert } from 'react-native';
 import AuthLayout from '../components/AuthLayout';
+import axios from 'axios';
+import{API_BASE_URL} from '../config';
 
-export default function ResetCodeScreen({ navigation }) {
+
+
+
+
+export default function ResetCodeScreen({ navigation, route }) {
   const [code, setCode] = useState('');
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    if (route.params?.email) {
+      setEmail(route.params.email); // Armazena o e-mail da tela anterior
+    }
+  }, []);
+
+  const validarCodigo = async () => {
+
+    await axios.post(`${API_BASE_URL}/email/validar-codigo`, { email: email, codigo:code}).then(response => {
+      console.log('Código validado com sucesso:', response.data);
+       navigation.navigate('NewPassword', {  email: email, codigo:code }); // Navega para a tela de nova senha
+    }).catch(error => {
+      console.error('Erro ao validar código:', error.response?.data || error.message);
+      Alert.alert('Erro', 'Código inválido ou expirado. Tente novamente.');
+    });
+     
+ 
+
+    
+
+}
+
 
   return (
     <AuthLayout>
@@ -22,7 +52,7 @@ export default function ResetCodeScreen({ navigation }) {
 
         <TouchableOpacity
           style={styles.verifyButton}
-           onPress={() => navigation.navigate('NewPassword')}
+           onPress={validarCodigo}
         >
           <Text style={styles.verifyButtonText}>Verificar código</Text>
         </TouchableOpacity>
