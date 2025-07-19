@@ -4,24 +4,39 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 export default function FooterGradient() {
   return (
-    <LinearGradient colors={['#0f172a', '#1d4ed8']} style={styles.footer}>
-      <Text style={styles.text}>© 2025 Big GitMatch</Text>
-      <Text style={styles.text}>Contato: suporte@gitmatch.com</Text>
-      <Text style={styles.text}>Termos de uso | Privacidade</Text>
+    <LinearGradient colors={['#1d4ed8', '#0f172a']} style={styles.footer}>
+      <Text style={styles.logo}>GitMatch</Text>
+      <Text style={styles.text}>© 2025 GitMatch. Todos os direitos reservados.</Text>
+      <Text style={styles.text}>suporte@gitmatch.com</Text>
+      <Text style={styles.links}>Termos de uso • Privacidade</Text>
     </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   footer: {
-    width: '100%',
-    padding: 20,
+    padding: 24,
     alignItems: 'center',
-    marginTop: 30,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    marginTop: 20,
+  },
+  logo: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 8,
   },
   text: {
-    color: '#ffffff',
-    fontSize: 14,
-    marginVertical: 2,
+    fontSize: 13,
+    color: '#e2e8f0',
+    marginBottom: 2,
+    textAlign: 'center',
+  },
+  links: {
+    fontSize: 12,
+    color: '#93c5fd',
+    marginTop: 8,
+    textAlign: 'center',
   },
 });

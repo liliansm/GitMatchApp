@@ -6,7 +6,9 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
+import NavigationMenu from '../components/NavigationMenu';
 
 export default function NotificationsScreen() {
   const notifications = [
@@ -44,6 +46,27 @@ export default function NotificationsScreen() {
     },
   ];
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Tem certeza?',
+      'Deseja mesmo excluir sua conta? Essa ação não poderá ser desfeita.',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Sim, excluir',
+          style: 'destructive',
+          onPress: () => {
+            console.log('Conta excluída');
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
@@ -52,7 +75,9 @@ export default function NotificationsScreen() {
         {notifications.map((item) => (
           <View key={item.id} style={styles.notificationBox}>
             {item.type === 'vaga' ? (
-              <View style={[styles.iconCircle, { backgroundColor: item.iconColor }]} />
+              <View
+                style={[styles.iconCircle, { backgroundColor: item.iconColor }]}
+              />
             ) : (
               <Image source={{ uri: item.image }} style={styles.profileImage} />
             )}
@@ -69,7 +94,10 @@ export default function NotificationsScreen() {
         <TouchableOpacity style={styles.viewMore}>
           <Text style={styles.viewMoreText}>Ver mais notificações</Text>
         </TouchableOpacity>
+
       </ScrollView>
+
+      <NavigationMenu />
     </View>
   );
 }
@@ -81,6 +109,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
+    paddingBottom: 100, 
   },
   title: {
     fontSize: 22,
@@ -129,5 +158,17 @@ const styles = StyleSheet.create({
   viewMoreText: {
     fontSize: 14,
     color: '#666',
+  },
+  deleteButton: {
+    marginTop: 30,
+    backgroundColor: '#dc2626',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });

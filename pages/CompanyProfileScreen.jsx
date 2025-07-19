@@ -7,11 +7,20 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import NavigationMenu from '../components/NavigationMenu';
 
-export default function CompanyProfileScreen() {
+export default function CompanyProfileScreen({ navigation }) {
   return (
-    <View style={styles.mainContainer}>
+    <View style={styles.container}>
+      {/* Header com botão de menu */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+          <Ionicons name="menu" size={28} color="#1d4ed8" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Conteúdo rolável */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.profileHeader}>
           <Image
@@ -21,7 +30,10 @@ export default function CompanyProfileScreen() {
           <Text style={styles.companyName}>Inova Tech</Text>
           <Text style={styles.subtitle}>Inovação que transforma o agora</Text>
 
-          <TouchableOpacity style={styles.viewJobsButton}>
+          <TouchableOpacity
+            style={styles.viewJobsButton}
+            onPress={() => navigation.navigate('CompanyJobs')}
+          >
             <Text style={styles.viewJobsButtonText}>Visualizar vagas</Text>
           </TouchableOpacity>
         </View>
@@ -37,27 +49,33 @@ export default function CompanyProfileScreen() {
           </Text>
         </View>
       </ScrollView>
-      
+
+      {/* Menu de navegação inferior */}
       <NavigationMenu />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  mainContainer: {
+  container: {
     flex: 1,
     backgroundColor: '#EEF3F9',
-    position: 'relative',
+  },
+  header: {
+    height: 60,
+    paddingHorizontal: 20,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    backgroundColor: '#EEF3F9',
   },
   scrollContent: {
-    paddingBottom: 180, 
-    paddingHorizontal: 0, 
+    paddingBottom: 180,
   },
   profileHeader: {
     alignItems: 'center',
-    paddingTop: 40,
-    marginBottom: 24,
+    paddingTop: 20,
     paddingHorizontal: 24,
+    marginBottom: 24,
   },
   avatar: {
     width: 150,
@@ -90,7 +108,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 40,
     borderRadius: 8,
-    marginBottom: 40, 
+    marginBottom: 40,
     shadowColor: '#2A4BA0',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
@@ -109,17 +127,17 @@ const styles = StyleSheet.create({
     paddingTop: 32,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    marginTop: 20, 
+    marginTop: 20,
   },
   descriptionTitle: {
-    fontSize: 20, 
+    fontSize: 20,
     fontWeight: '600',
     color: '#1A1A1A',
     marginBottom: 16,
   },
   descriptionText: {
-    fontSize: 16, 
-    lineHeight: 24, 
+    fontSize: 16,
+    lineHeight: 24,
     color: '#444',
   },
 });

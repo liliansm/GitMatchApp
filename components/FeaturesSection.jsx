@@ -3,92 +3,59 @@ import {
   View,
   Text,
   StyleSheet,
-  useWindowDimensions,
   Image,
 } from 'react-native';
 import { FontAwesome5, MaterialIcons, Ionicons } from '@expo/vector-icons';
 
 export default function FeaturesSection() {
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 768;
-
   return (
-    <View style={[styles.container, isDesktop && styles.desktopContainer]}>
-      {/* Textos e ícones */}
-      <View style={styles.textContainer}>
-        <Text style={styles.heading}>Como Funciona?</Text>
-        <Text style={styles.subheading}>
-          Encontre a vaga ideal em 3 passos simples
-        </Text>
+    <View style={styles.container}>
+      <Text style={styles.heading}>Como Funciona?</Text>
+      <Text style={styles.subheading}>
+        Encontre a vaga ideal em apenas 3 passos
+      </Text>
 
-        <View style={styles.stepsContainer}>
-          <View style={styles.step}>
-            <FontAwesome5 name="github" size={28} color="#1d4ed8" />
-            <View style={styles.stepTextContainer}>
-              <Text style={styles.stepTitle}>Conecte seu GitHub</Text>
-              <Text style={styles.stepText}>
-                Crie uma conta utilizando o link do seu perfil do GitHub para
-                obter uma análise técnica instantânea.
-              </Text>
+      <View style={styles.stepsContainer}>
+        {features.map((item, index) => (
+          <View key={index} style={styles.stepCard}>
+            <View style={styles.iconCircle}>{item.icon}</View>
+            <View style={styles.textContent}>
+              <Text style={styles.stepTitle}>{item.title}</Text>
+              <Text style={styles.stepText}>{item.text}</Text>
             </View>
           </View>
-
-          <View style={styles.step}>
-            <MaterialIcons name="work-outline" size={28} color="#1d4ed8" />
-            <View style={styles.stepTextContainer}>
-              <Text style={styles.stepTitle}>Descubra vagas compatíveis</Text>
-              <Text style={styles.stepText}>
-                Receba recomendações de vagas que combinam com seu perfil e suas
-                competências em projetos reais.
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.step}>
-            <Ionicons
-              name="checkmark-done-circle-outline"
-              size={28}
-              color="#1d4ed8"
-            />
-            <View style={styles.stepTextContainer}>
-              <Text style={styles.stepTitle}>Candidate-se com confiança</Text>
-              <Text style={styles.stepText}>
-                Escolha a vaga ideal, veja seu índice de compatibilidade e envie
-                sua candidatura diretamente pela plataforma.
-              </Text>
-            </View>
-          </View>
-        </View>
+        ))}
       </View>
-
-      {/* Imagem */}
-      {isDesktop && (
-        <Image
-          source={require('../assets/img2Home.png')}
-          style={styles.image}
-          resizeMode="contain"
-        />
-      )}
     </View>
   );
 }
 
+const features = [
+  {
+    icon: <FontAwesome5 name="github" size={22} color="#1d4ed8" />,
+    title: 'Conecte seu GitHub',
+    text: 'Crie sua conta usando seu perfil do GitHub e tenha uma análise técnica instantânea.',
+  },
+  {
+    icon: <MaterialIcons name="work-outline" size={24} color="#1d4ed8" />,
+    title: 'Descubra vagas compatíveis',
+    text: 'Receba sugestões de vagas alinhadas com seu perfil e experiências reais.',
+  },
+  {
+    icon: <Ionicons name="checkmark-done-circle-outline" size={24} color="#1d4ed8" />,
+    title: 'Candidate-se com confiança',
+    text: 'Veja seu índice de compatibilidade e envie sua candidatura diretamente.',
+  },
+];
+
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 40,
     paddingHorizontal: 20,
-  },
-  desktopContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 30,
-  },
-  textContainer: {
-    flex: 1,
+    paddingVertical: 40,
+    backgroundColor: '#f8fafc',
   },
   heading: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#0f172a',
     marginBottom: 6,
@@ -99,18 +66,34 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   stepsContainer: {
-    gap: 20,
+    gap: 16,
   },
-  step: {
+  stepCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  stepTextContainer: {
+  iconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#e0e7ff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 2,
+  },
+  textContent: {
     flex: 1,
   },
   stepTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: '#1e293b',
     marginBottom: 4,
@@ -118,10 +101,6 @@ const styles = StyleSheet.create({
   stepText: {
     fontSize: 14,
     color: '#475569',
-  },
-  image: {
-    flex: 1,
-    width: 300,
-    height: 300,
+    lineHeight: 20,
   },
 });

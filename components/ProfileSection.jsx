@@ -5,37 +5,37 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 
 export default function ProfileSection({ user }) {
   return (
     <View style={styles.container}>
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.profileHeader}>
           <Image source={{ uri: user.avatar }} style={styles.avatar} />
-          
-          <View style={styles.headerText}>
-            <Text style={styles.name}>{user.name}</Text>
-            <Text style={styles.username}>{user.username}</Text>
-            <Text style={styles.title}>{user.title}</Text>
-          </View>
 
-          <TouchableOpacity style={styles.analysisButton}>
+          <Text style={styles.name}>{user.name}</Text>
+          <Text style={styles.username}>@{user.username}</Text>
+          <Text style={styles.title}>{user.title}</Text>
+
+          <TouchableOpacity
+            style={styles.analysisButton}
+            onPress={() => navigation.navigate('PainelVagas')}
+          >
             <Text style={styles.analysisButtonText}>Ver Análise</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Movemos o conteúdo cinza para dentro do ScrollView */}
         <View style={styles.grayContainer}>
           <Text style={styles.sectionTitle}>Habilidades</Text>
           <View style={styles.techContainer}>
             {user.techs.map((tech, index) => (
-              <View key={index} style={styles.techCard}>
-                <Text style={styles.techText}>{tech}</Text>
+              <View key={index} style={styles.techChip}>
+                <Text style={styles.techChipText}>#{tech}</Text>
               </View>
             ))}
           </View>
@@ -56,72 +56,69 @@ const styles = StyleSheet.create({
     backgroundColor: '#EEF3F9',
   },
   scrollContent: {
-    paddingBottom: 100,
+    paddingBottom: 80,
   },
   profileHeader: {
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: 40,
-    marginBottom: 24,
+    paddingTop: 48,
+    backgroundColor: '#ffffff',
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    elevation: 3,
+    marginBottom: 20,
   },
   avatar: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: 130,
+    height: 130,
+    borderRadius: 65,
     borderWidth: 3,
-    borderColor: '#FFF',
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  headerText: {
-    alignItems: 'center',
-    marginBottom: 24,
+    borderColor: '#1d4ed8',
+    marginBottom: 12,
   },
   name: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '700',
-    color: '#1A1A1A',
-    marginBottom: 4,
+    color: '#1e293b',
   },
   username: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 14,
+    color: '#64748b',
     marginBottom: 4,
   },
   title: {
-    fontSize: 16,
-    color: '#2A4BA0',
-    fontWeight: '500',
+    fontSize: 15,
+    color: '#1d4ed8',
+    fontWeight: '600',
+    marginBottom: 12,
   },
   analysisButton: {
-    backgroundColor: '#2A4BA0',
-    paddingVertical: 12,
-    paddingHorizontal: 40,
-    borderRadius: 8,
-    marginBottom: 32, 
-    shadowColor: '#2A4BA0',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
+    backgroundColor: '#1d4ed8',
+    paddingVertical: 10,
+    paddingHorizontal: 36,
+    borderRadius: 24,
+    elevation: 2,
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  analysisButtonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 15,
   },
   grayContainer: {
-    backgroundColor: '#F5F7FA',
-    padding: 24,
-    paddingTop: 32,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    marginTop: 20,
-    marginHorizontal: 10, 
+    backgroundColor: '#F8FAFC',
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 32,
+    borderRadius: 20,
+    marginHorizontal: 16,
+    elevation: 1,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: '#0f172a',
     marginBottom: 16,
   },
   techContainer: {
@@ -130,34 +127,31 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 24,
   },
-  techCard: {
-    backgroundColor: '#FFF',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+  techChip: {
+    borderColor: '#1d4ed8',
+    borderWidth: 1.2,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 16,
+    backgroundColor: '#e0ecff',
   },
-  techText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#2A4BA0',
+  techChipText: {
+    color: '#1d4ed8',
+    fontWeight: '600',
+    fontSize: 13,
   },
   bioSection: {
-    marginTop: 16,
+    marginTop: 8,
   },
   bioTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 12,
+    color: '#0f172a',
+    marginBottom: 8,
   },
   description: {
     fontSize: 15,
+    color: '#334155',
     lineHeight: 22,
-    color: '#444',
   },
 });

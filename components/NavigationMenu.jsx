@@ -2,8 +2,11 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
-const NavigationMenu = ({ activeTab, onTabPress }) => {
+const NavigationMenu = ({ activeTab }) => {
+  const navigation = useNavigation();
+
   return (
     <LinearGradient 
       colors={['#0f172a', '#1d4ed8']} 
@@ -13,10 +16,10 @@ const NavigationMenu = ({ activeTab, onTabPress }) => {
     >
       <TouchableOpacity 
         style={styles.tab} 
-        onPress={() => onTabPress('home')}
+        onPress={() => navigation.navigate('Home')}
       >
         <Ionicons 
-          name={activeTab === 'home' ? 'home' : 'home-outline'} 
+          name={activeTab === 'Home' ? 'home' : 'home-outline'} 
           size={24} 
           color="#fff" 
         />
@@ -25,7 +28,7 @@ const NavigationMenu = ({ activeTab, onTabPress }) => {
 
       <TouchableOpacity 
         style={styles.tab} 
-        onPress={() => onTabPress('notifications')}
+        onPress={() => navigation.navigate('Notification')}
       >
         <Ionicons 
           name={activeTab === 'notifications' ? 'notifications' : 'notifications-outline'} 
@@ -37,7 +40,7 @@ const NavigationMenu = ({ activeTab, onTabPress }) => {
 
       <TouchableOpacity 
         style={styles.tab} 
-        onPress={() => onTabPress('jobs')}
+        onPress={() => navigation.navigate('SuggestedJobs')}
       >
         <MaterialIcons 
           name={activeTab === 'jobs' ? 'work' : 'work-outline'} 
@@ -49,7 +52,7 @@ const NavigationMenu = ({ activeTab, onTabPress }) => {
 
       <TouchableOpacity 
         style={styles.tab} 
-        onPress={() => onTabPress('profile')}
+        onPress={() => navigation.navigate('Profile')}
       >
         <FontAwesome 
           name={activeTab === 'profile' ? 'user' : 'user-o'} 

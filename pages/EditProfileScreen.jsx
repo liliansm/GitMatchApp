@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function EditProfileScreen() {
+export default function EditProfileScreen({ navigation }) {
   const [name, setName] = useState('Eduarda Silva');
   const [email, setEmail] = useState('eduardasilva@gmail.com');
   const [profession, setProfession] = useState('Desenvolvedora Frontend');
@@ -20,19 +20,28 @@ export default function EditProfileScreen() {
   );
 
   const handleSave = () => {
-    Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
+    Alert.alert('Sucesso', 'Perfil atualizado com sucesso!', [
+      {
+        text: 'OK',
+        onPress: () => navigation.navigate('Profile'),
+      },
+    ]);
   };
 
   const handleAttachCV = () => {
-    // Lógica para anexar currículo
     Alert.alert('Anexar Currículo', 'Selecione o arquivo do currículo');
   };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
+        {/* Setinha de voltar */}
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Profile')}>
+          <Ionicons name="arrow-back" size={28} color="#2A4BA0" />
+        </TouchableOpacity>
+
         <Text style={styles.title}>Editar Perfil</Text>
-        
+
         <View style={styles.avatarContainer}>
           <Image
             source={{ uri: 'https://randomuser.me/api/portraits/women/44.jpg' }}
@@ -101,6 +110,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#EEF3F9',
     paddingHorizontal: 24,
     paddingTop: 24,
+    position: 'relative',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 24,
+    left: 16,
+    zIndex: 10,
   },
   title: {
     fontSize: 24,
@@ -112,7 +128,7 @@ const styles = StyleSheet.create({
   avatarContainer: {
     alignItems: 'center',
     marginBottom: 32,
-    position: 'relative',
+    marginTop: 16,
   },
   avatar: {
     width: 120,
@@ -120,15 +136,6 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     borderWidth: 3,
     borderColor: '#FFF',
-  },
-  editAvatarButton: {
-    position: 'absolute',
-    right: 10,
-    bottom: 10,
-    backgroundColor: '#FFF',
-    borderRadius: 20,
-    padding: 6,
-    elevation: 3,
   },
   formContainer: {
     marginBottom: 24,
@@ -165,6 +172,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E2E8F0',
     borderStyle: 'dashed',
+    marginTop: 8,
   },
   attachButtonText: {
     fontSize: 16,
@@ -183,6 +191,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
+    marginTop: 16,
   },
   saveButtonText: {
     color: '#FFF',
