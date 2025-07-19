@@ -10,6 +10,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import AuthLayout from '../components/AuthLayout';
 import { login } from '../service/authService';
 import { Alert } from 'react-native';
+import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -35,6 +37,33 @@ export default function LoginScreen({ navigation }) {
     }
   };
 
+ const gitHubLogin = async () => {
+    if (!email || !senha) {
+      console.log('Erro', 'Preencha e-mail e senha');
+      return;
+    }
+    setLoading(true);
+      await axios.get(`${API_BASE_URL}/api/oauth/github/login`,{ email, senha }).then(response => {
+        console.log('Login bem-sucedido:', response.data);
+        const { usuario: { idUsuario, nome, email: emailUsuario, tipoUsuario, token }, mensagem } = response.data;
+        navigation.navigate('Profile', { 
+
+             idUsuario: idUsuario,
+            nome: nome,
+          emailUsuario: emailUsuario,
+        token: token,
+
+
+         }); // Navega para a tela de perfil com os dados do usuário
+      }).catch(error => {
+        console.error('Erro ao fazer login:', error.response?.data || error.message);
+        Alert.alert('Erro', 'E-mail ou senha inválidos');
+      })
+
+       setLoading(false);
+  };
+
+
   return (
     <AuthLayout
       title="Bem-vindo de volta!"
@@ -52,9 +81,10 @@ export default function LoginScreen({ navigation }) {
         </TouchableOpacity>
       }
     >
-      <TouchableOpacity style={styles.githubButton}>
+      <TouchableOpacity style={styles.githubButton}  onPress={gitHubLogin}>
         <FontAwesome name="github" size={20} color="#fff" style={{ marginRight: 8 }} />
         <Text style={styles.githubText}>Entrar com GitHub</Text>
+
       </TouchableOpacity>
 
       <TextInput
