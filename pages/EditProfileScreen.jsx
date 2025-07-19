@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,22 +10,60 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import { api } from '../service/api';
 
-export default function EditProfileScreen({ navigation }) {
-  const [name, setName] = useState('Eduarda Silva');
-  const [email, setEmail] = useState('eduardasilva@gmail.com');
-  const [profession, setProfession] = useState('Desenvolvedora Frontend');
-  const [bio, setBio] = useState(
-    'Profissional de tecnologia com foco em Python e na área de dados. Comprometida com inovação e desenvolvimento contínuo.'
-  );
+export default function EditProfileScreen() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [profession, setProfession] = useState('');
+  const [bio, setBio] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const navigation = useNavigation();
 
-  const handleSave = () => {
-    Alert.alert('Sucesso', 'Perfil atualizado com sucesso!', [
-      {
-        text: 'OK',
-        onPress: () => navigation.navigate('Profile'),
-      },
-    ]);
+  useEffect(() => {
+    const carregarDadosUsuario = async () => {
+      try {
+        const userId = await AsyncStorage.getItem('userId');
+        if (!userId) return;
+
+        const response = await api.get(`/usuario/usuarios/${userId}`);
+        const user = response.data;
+
+        setName(user.nome || '');
+        setEmail(user.email || '');
+        setProfession(user.profissao || '');
+        setBio(user.bio || '');
+      } catch (error) {
+        console.error('Erro ao carregar dados do usuário:', error);
+      }
+    };
+
+    carregarDadosUsuario();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      const userId = await AsyncStorage.getItem('userId');
+      if (!userId) throw new Error('Usuário não autenticado.');
+
+      const payload = {
+        nome: name,
+        email: email,
+        profissao: profession,
+        bio: bio,
+      };
+
+      await api.put(`/usuario/${userId}`, payload);
+
+      setSuccessMessage('Perfil alterado com sucesso!');
+      setTimeout(() => setSuccessMessage(''), 3000); // Esconde após 3 segundos
+
+    } catch (error) {
+      console.error('Erro ao atualizar perfil:', error.response?.data || error.message);
+      Alert.alert('Erro', 'Não foi possível atualizar o perfil.');
+    }
   };
 
   const handleAttachCV = () => {
@@ -35,8 +73,7 @@ export default function EditProfileScreen({ navigation }) {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-        {/* Setinha de voltar */}
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Profile')}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={28} color="#2A4BA0" />
         </TouchableOpacity>
 
@@ -91,6 +128,10 @@ export default function EditProfileScreen({ navigation }) {
             <Text style={styles.attachButtonText}>Anexar Currículo</Text>
           </TouchableOpacity>
         </View>
+
+        {successMessage !== '' && (
+          <Text style={styles.successMessage}>{successMessage}</Text>
+        )}
 
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveButtonText}>Salvar Alterações</Text>
@@ -198,4 +239,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+
+
+  successMessage: {
+  backgroundColor: '#D1FAE5',
+  color: '#065F46',
+  textAlign: 'center',
+  padding: 12,
+  borderRadius: 8,
+  marginTop: 10,
+  fontWeight: '500',
+},
+
 });
+
+
+
+
+

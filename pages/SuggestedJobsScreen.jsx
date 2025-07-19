@@ -1,33 +1,91 @@
-import React from 'react';
-import { View, ScrollView, StyleSheet, Text } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, ScrollView, StyleSheet, Text, ActivityIndicator, Alert } from 'react-native';
 import NavigationMenu from '../components/NavigationMenu';
 import JobCard from '../components/JobCard';
-import { suggestedJobs } from '../data/jobs';
+import { api } from '../service/api'; // Assumindo que você tenha axios configurado aqui
 
-const SuggestedJobsScreen = ({ navigation }) => (
-  <View style={styles.mainContainer}>
-    <ScrollView 
-      contentContainerStyle={styles.scrollContent}
-      showsVerticalScrollIndicator={false}
-    >
-      <Text style={styles.headerTitle}>Vagas Sugeridas</Text>
-      <Text style={styles.headerSubtitle}>Baseado no seu perfil e preferências</Text>
-      
-      <View style={styles.jobsContainer}>
-        {suggestedJobs.map((job, index) => (
-          <JobCard
-            key={index}
-            {...job}
-            onPress={() => navigation.navigate('JobMatch')}
-            style={styles.jobCard}
-          />
-        ))}
-      </View>
-    </ScrollView>
-    
-    <NavigationMenu />
-  </View>
-);
+const SuggestedJobsScreen = ({ navigation }) => {
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        setLoading(true);
+
+        
+        const techResponse = await api.get('/vaga/usuario/tecnologias');
+        const tecnologias = techResponse.data;
+
+        if (!Array.isArray(tecnologias) || tecnologias.length === 0) {
+          Alert.alert('Nenhuma tecnologia', 'Não foram encontradas tecnologias cadastradas no perfil.');
+          setJobs([]);
+          setLoading(false);
+          return;
+        }
+
+       
+        const vagasResponse = await api.post('/vaga/buscar', tecnologias);
+        const vagas = vagasResponse.data;
+
+        
+        const formattedJobs = vagas.map(vaga => ({
+  id: vaga.idVaga,
+  title: vaga.tituloVaga,       
+  company: vaga.nomeEmpresa,
+  skills: vaga.tecnologias,
+}));
+
+
+        setJobs(formattedJobs);
+      } catch (error) {
+        console.error('Erro ao buscar vagas sugeridas:', error);
+        Alert.alert('Erro', 'Não foi possível carregar as vagas sugeridas.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
+  return (
+    <View style={styles.mainContainer}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.headerTitle}>Vagas Sugeridas</Text>
+        <Text style={styles.headerSubtitle}>Baseado no seu perfil e preferências</Text>
+
+        {loading ? (
+          <ActivityIndicator size="large" color="#2A4BA0" />
+        ) : (
+          <View style={styles.jobsContainer}>
+            {jobs.length === 0 ? (
+              <Text style={{ textAlign: 'center', marginTop: 20, color: '#666' }}>
+                Nenhuma vaga encontrada para as tecnologias do seu perfil.
+              </Text>
+            ) : (
+              jobs.map(job => (
+                <JobCard
+                  key={job.id}
+                  title={job.title}
+                  company={job.company}
+                  skills={job.skills}
+                  onPress={() => navigation.navigate('JobMatch', { vagaId: job.id })}
+
+                />
+              ))
+            )}
+          </View>
+        )}
+      </ScrollView>
+
+      <NavigationMenu />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -38,7 +96,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 24,
-    paddingBottom: 100, 
+    paddingBottom: 100,
   },
   headerTitle: {
     fontSize: 24,
@@ -53,14 +111,6 @@ const styles = StyleSheet.create({
   },
   jobsContainer: {
     gap: 16,
-  },
-  jobCard: {
-    marginBottom: 16, 
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
 });
 

@@ -7,9 +7,8 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-web';
 
-export default function ProfileSection({ user }) {
+export default function ProfileSection({ user, navigation }) {
   return (
     <View style={styles.container}>
       <ScrollView
@@ -17,11 +16,11 @@ export default function ProfileSection({ user }) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.profileHeader}>
-          <Image source={{ uri: user.avatar }} style={styles.avatar} />
+          <Image source={{ uri: user.fotoPerfil }} style={styles.avatar} />
 
-          <Text style={styles.name}>{user.name}</Text>
-          <Text style={styles.username}>@{user.username}</Text>
-          <Text style={styles.title}>{user.title}</Text>
+          <Text style={styles.name}>{user.nome}</Text>
+          <Text style={styles.username}>@{user.githubUsername}</Text>
+          <Text style={styles.title}>{user.profissao}</Text>
 
           <TouchableOpacity
             style={styles.analysisButton}
@@ -34,16 +33,20 @@ export default function ProfileSection({ user }) {
         <View style={styles.grayContainer}>
           <Text style={styles.sectionTitle}>Habilidades</Text>
           <View style={styles.techContainer}>
-            {user.techs.map((tech, index) => (
-              <View key={index} style={styles.techChip}>
-                <Text style={styles.techChipText}>#{tech}</Text>
-              </View>
-            ))}
+            {user.tecnologias.length > 0 ? (
+              user.tecnologias.map((tech, index) => (
+                <View key={index} style={styles.techChip}>
+                  <Text style={styles.techChipText}>#{tech}</Text>
+                </View>
+              ))
+            ) : (
+              <Text>Nenhuma tecnologia cadastrada</Text>
+            )}
           </View>
 
           <View style={styles.bioSection}>
             <Text style={styles.bioTitle}>Sobre</Text>
-            <Text style={styles.description}>{user.description}</Text>
+            <Text style={styles.description}>{user.bio}</Text>
           </View>
         </View>
       </ScrollView>
