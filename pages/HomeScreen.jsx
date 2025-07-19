@@ -13,15 +13,15 @@ import FeaturesSection from '../components/FeaturesSection';
 import TestimonialsSection from '../components/TestimonialsSection';
 import FooterGradient from '../components/FooterGradient';
 
-// Substitua por autenticação real (useContext/useAuth)
-const isLoggedIn = true; // ← simulação
+// Substituir por autenticação real (useContext/useAuth)
+const isLoggedIn = false; // ← simulação
 
 export default function HomeScreen({ navigation }) {
   const [menuVisible, setMenuVisible] = useState(false);
 
   const handleLogout = () => {
     setMenuVisible(false);
-    // Coloque sua lógica real de logout aqui
+    // Colocar lógica real de logout
     alert('Você saiu!');
   };
 
@@ -64,8 +64,8 @@ export default function HomeScreen({ navigation }) {
                 <TouchableOpacity style={styles.menuItem} onPress={() => handleNavigate('Login')}>
                   <Text style={styles.menuText}>Login</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.menuItem} onPress={() => handleNavigate('Cadastro')}>
-                  <Text style={styles.menuText}>Cadastrar</Text>
+                <TouchableOpacity style={styles.menuItem} onPress={() => handleNavigate('Register')}>
+                  <Text style={styles.menuText}>Cadastrar-se</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -74,7 +74,7 @@ export default function HomeScreen({ navigation }) {
       </Modal>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <HeroSection navigation={navigation} />
+        <HeroSection navigation={navigation} isLoggedIn={isLoggedIn} />
         <FeaturesSection />
         <TestimonialsSection />
         <FooterGradient />

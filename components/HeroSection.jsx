@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, useWindowDimensions, TouchableOpacity } 
 import { MaterialIcons } from '@expo/vector-icons';
 import { useFonts, Poly_400Regular } from '@expo-google-fonts/poly';
 
-export default function HeroSection({ navigation }) {
+export default function HeroSection({ navigation, isLoggedIn }) {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
 
@@ -12,7 +12,6 @@ export default function HeroSection({ navigation }) {
 
   return (
     <View style={styles.wrapper}>
-      {/* Texto principal */}
       <View style={styles.hero}>
         <Text style={styles.title}>
           Conecte-se com a vaga ideal através do seu GitHub
@@ -22,7 +21,6 @@ export default function HeroSection({ navigation }) {
           O GitMatch analisa suas habilidades e projetos para te recomendar oportunidades com base no seu perfil técnico.
         </Text>
 
-        {/* Etapas / Benefícios */}
         <View style={styles.featuresList}>
           <Feature icon="insights" label="Análises técnicas automáticas" />
           <Feature icon="update" label="Vagas sempre atualizadas" />
@@ -31,11 +29,14 @@ export default function HeroSection({ navigation }) {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation?.navigate('Login')}
+          onPress={() => navigation?.navigate(isLoggedIn ? 'Profile' : 'Login')}
         >
-          <Text style={styles.buttonText}>Entre agora</Text>
+          <Text style={styles.buttonText}>
+            {isLoggedIn ? 'Ver Perfil' : 'Entre agora'}
+          </Text>
         </TouchableOpacity>
       </View>
+
       {!isDesktop && (
         <Image
           source={require('../assets/img1Home.png')}
