@@ -12,9 +12,10 @@ import {
   MaterialIcons,
   FontAwesome5,
 } from '@expo/vector-icons';
-
+import { logout } from '../service/authService'; 
 export default function SettingsScreen({ navigation }) {
   const handleLogout = () => {
+    logout();
     navigation.navigate('Login');
   };
 

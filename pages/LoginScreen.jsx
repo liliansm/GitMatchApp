@@ -24,9 +24,8 @@ export default function LoginScreen({ navigation }) {
     setLoading(true);
     try {
       const data = await login({ email, senha }); 
-
       console.log('Login bem-sucedido:',data);
-      navigation.navigate('Profile');
+      navigation.navigate('Profile', { user: data }); // Navega para a tela de perfil com os dados do usuário
 
     } catch (error) {
       

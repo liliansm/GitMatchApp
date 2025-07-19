@@ -12,6 +12,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_BASE_URL } from '../config';
 import { Ionicons } from '@expo/vector-icons'; // Certifique-se de instalar: expo install @expo/vector-icons
+import { api } from '../service/api';
 
 export default function UpdatePasswordScreen({ navigation }) {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -31,18 +32,12 @@ export default function UpdatePasswordScreen({ navigation }) {
 
     try {
       const token = await AsyncStorage.getItem("token");
-
-      await axios.put(
-        `${API_BASE_URL}/usuario/alterar-senha`,
+      console.log("Token enviado:", token);
+      await api.put(
+        `/usuario/alterar-senha`,
         {
           senhaAtual: currentPassword,
           novaSenha: newPassword,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
         }
       );
 

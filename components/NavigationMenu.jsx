@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 
 const NavigationMenu = ({ activeTab }) => {
   const navigation = useNavigation();
-
+  
   return (
     <LinearGradient 
       colors={['#0f172a', '#1d4ed8']} 
