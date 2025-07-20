@@ -2,6 +2,15 @@
   "expo": {
     "name": "gitMatch",
     "slug": "gitMatch",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "scheme": "gitmatch",
+    "plugins": [
+      "expo-web-browser"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "seu-id-do-eas"
+      }
+    }
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,27 +10,66 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { api } from '../service/api';
 
-export default function EditCompanyProfileScreen() {
-  const [name, setName] = useState('Inova Tech');
-  const [slogan, setSlogan] = useState('Inovação que transforma o agora');
-  const [description, setDescription] = useState(
-    'Inova Tech é uma startup especializada em soluções digitais inteligentes para micro e pequenas empresas. Atuamos com consultoria tecnológica, criação de sistemas personalizados e transformação digital acessível, ajudando empreendedores a se destacarem em um mercado competitivo por meio da inovação.'
-  );
+export default function EditCompanyProfileScreen({ navigation }) {
+  const [name, setName] = useState('');
+  const [slogan, setSlogan] = useState('');
+  const [description, setDescription] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
-  const handleSave = () => {
-    Alert.alert('Sucesso', 'Perfil da empresa atualizado com sucesso!');
-  };
+  useEffect(() => {
+    const carregarEmpresa = async () => {
+      try {
+        const userId = await AsyncStorage.getItem('userId');
+        if (!userId) return;
 
-  const handleChangeLogo = () => {
-    Alert.alert('Alterar Logo', 'Selecione uma nova imagem para o logo');
+        const response = await api.get(`/usuario/usuarios/${userId}`);
+        const data = response.data;
+
+        setName(data.nome || '');
+        setSlogan(data.profissao || '');
+        setDescription(data.bio || '');
+      } catch (error) {
+        console.error('Erro ao carregar dados da empresa:', error);
+        Alert.alert('Erro', 'Não foi possível carregar os dados da empresa.');
+      }
+    };
+
+    carregarEmpresa();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      const userId = await AsyncStorage.getItem('userId');
+      if (!userId) return;
+
+      const payload = {
+        nome: name,
+        profissao: slogan,
+        bio: description,
+      };
+
+      await api.put(`/usuario/${userId}`, payload);
+
+      setSuccessMessage('Perfil da empresa atualizado com sucesso!');
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Erro ao atualizar perfil:', error.response?.data || error.message);
+      Alert.alert('Erro', 'Não foi possível atualizar o perfil da empresa.');
+    }
   };
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="#1e293b" />
+        </TouchableOpacity>
+
         <Text style={styles.title}>Editar Perfil da Empresa</Text>
-        
+
         <View style={styles.avatarContainer}>
           <Image
             source={{ uri: 'https://i.imgur.com/V9gTjFh.png' }}
@@ -42,29 +81,33 @@ export default function EditCompanyProfileScreen() {
           <Text style={styles.label}>Nome da Empresa</Text>
           <TextInput
             style={styles.input}
-            placeholder="Digite o nome da empresa"
             value={name}
             onChangeText={setName}
+            placeholder="Digite o nome da empresa"
           />
 
           <Text style={styles.label}>Slogan</Text>
           <TextInput
             style={styles.input}
-            placeholder="Digite o slogan da empresa"
             value={slogan}
             onChangeText={setSlogan}
+            placeholder="Digite o slogan da empresa"
           />
 
           <Text style={styles.label}>Descrição</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
+            value={description}
+            onChangeText={setDescription}
             placeholder="Descreva sua empresa"
             multiline
             numberOfLines={5}
-            value={description}
-            onChangeText={setDescription}
           />
         </View>
+
+        {successMessage !== '' && (
+          <Text style={styles.successMessage}>{successMessage}</Text>
+        )}
 
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveButtonText}>Salvar Alterações</Text>
@@ -103,15 +146,6 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#FFF',
   },
-  editLogoButton: {
-    position: 'absolute',
-    right: 10,
-    bottom: 10,
-    backgroundColor: '#FFF',
-    borderRadius: 20,
-    padding: 6,
-    elevation: 3,
-  },
   formContainer: {
     marginBottom: 24,
   },
@@ -123,7 +157,6 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   input: {
-    width: '100%',
     backgroundColor: '#FFF',
     borderRadius: 12,
     paddingHorizontal: 16,
@@ -154,5 +187,14 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  successMessage: {
+    backgroundColor: '#D1FAE5',
+    color: '#065F46',
+    textAlign: 'center',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 10,
+    fontWeight: '500',
   },
 });

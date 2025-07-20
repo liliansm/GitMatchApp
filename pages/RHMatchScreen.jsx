@@ -1,58 +1,94 @@
-// RHMatchScreen.js
-import React from 'react';
-import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { api } from '../service/api';
+import { Ionicons } from '@expo/vector-icons';
 
-const candidatos = [
-  {
-    id: '1',
-    nome: 'Sara Castanho',
-    cargo: 'Engenharia de Software',
-    match: '85%',
-    foto: { uri: 'https://randomuser.me/api/portraits/women/44.jpg' },
-    habilidades: ['React', 'Node.js', 'PostgreSQL'],
-    experiencia: '3 anos na empresa X',
-  },
-  {
-    id: '2',
-    nome: 'Carlos Silva',
-    cargo: 'Analista de Dados',
-    match: '85%',
-    foto: { uri: 'https://randomuser.me/api/portraits/men/32.jpg' },
-    habilidades: ['Python', 'SQL', 'Power BI'],
-    experiencia: '2 anos na empresa Y',
-  },
-  // Adicione mais candidatos se quiser
-];
-
-export default function RHMatchScreen() {
+export default function RHMatchScreen({ route }) {
   const navigation = useNavigation();
+  const [candidatos, setCandidatos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const { idVaga } = route.params;
+
+  useEffect(() => {
+    const fetchCandidatos = async () => {
+      try {
+        console.log('Buscando candidatos para a vaga:', idVaga);
+        const response = await api.get(`/vaga/empresa/candidatosVaga/${idVaga}`);
+        console.log('Dados recebidos:', response.data);
+        setCandidatos(response.data.candidatos || []);
+      } catch (error) {
+        console.error('Erro ao buscar candidatos:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCandidatos();
+  }, [idVaga]);
 
   const abrirDetalhes = (candidato) => {
     navigation.navigate('CandidatoDetalhes', { candidato });
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#1d4ed8" />
+        <Text style={{ marginTop: 12 }}>Carregando candidatos...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Engenheiro(a) de Software</Text>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 12 }}>
+        <Ionicons name="arrow-back" size={24} color="#1e293b" />
+      </TouchableOpacity>
+
+      <Text style={styles.title}>Candidatos para a vaga</Text>
+
       <View style={styles.whiteContainer}>
         <FlatList
           data={candidatos}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.github || item.email}
           contentContainerStyle={styles.listContent}
           renderItem={({ item }) => (
             <TouchableOpacity style={styles.card} onPress={() => abrirDetalhes(item)}>
-              <Image source={item.foto} style={styles.avatar} />
+              <Image
+                source={
+                  item.fotoPerfil
+                    ? { uri: item.fotoPerfil }
+                    : { uri: 'https://randomuser.me/api/portraits/lego/1.jpg' }
+                }
+                style={styles.avatar}
+              />
               <View style={styles.info}>
                 <Text style={styles.nome}>{item.nome}</Text>
-                <Text style={styles.cargo}>{item.cargo}</Text>
+                <Text style={styles.cargo}>{item.profissao || 'Profissão não informada'}</Text>
               </View>
               <View style={styles.matchCircle}>
-                <Text style={styles.matchText}>{item.match}</Text>
+                <Text style={styles.matchText}>{item.compatibilidade}%</Text>
                 <Text style={styles.matchLabel}>match</Text>
               </View>
             </TouchableOpacity>
           )}
+          ListEmptyComponent={
+            <View style={{ padding: 20 }}>
+              <Text style={{ textAlign: 'center', color: '#666' }}>
+                Nenhum candidato encontrado para essa vaga.
+              </Text>
+            </View>
+          }
         />
       </View>
     </View>
@@ -61,6 +97,11 @@ export default function RHMatchScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#eef3f9' },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   title: {
     fontSize: 22,
     fontWeight: 'bold',

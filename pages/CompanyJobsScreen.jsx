@@ -1,59 +1,81 @@
-// screens/CompanyJobsScreen.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
-const mockJobs = [
-  {
-    id: '1',
-    cargo: 'Desenvolvedor Front-end',
-    local: 'Remoto',
-  },
-  {
-    id: '2',
-    cargo: 'Analista de Dados',
-    local: 'São Paulo - SP',
-  },
-];
+import { api } from '../service/api'; // já configurada
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function CompanyJobsScreen({ navigation }) {
-  const handleEdit = (jobId) => {
-    navigation.navigate('CriarVaga', { jobId }); // Simulação
+  const [vagas, setVagas] = useState([]);
+
+  useEffect(() => {
+    const fetchVagas = async () => {
+      try {
+        const response = await api.get('/vaga/empresa');
+        setVagas(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar vagas:', error);
+        Alert.alert('Erro', 'Não foi possível carregar as vagas.');
+      }
+    };
+
+    fetchVagas();
+  }, []);
+
+  const handleDelete = async (jobId) => {
+    try {
+      await api.delete(`/vaga/delete/${jobId}`);
+      setVagas(vagas.filter((vaga) => vaga.idVaga !== jobId));
+    } catch (error) {
+      console.error('Erro ao deletar vaga:', error);
+      Alert.alert('Erro', 'Não foi possível excluir a vaga.');
+    }
   };
 
-  const handleDelete = (jobId) => {
-    alert(`Excluir vaga com ID ${jobId}`);
+  const handleEdit = (idVaga) => {
+    navigation.navigate('EditVaga', { idVaga });
+  };
+
+  const handleNavigateToMatch = (idVaga) => {
+    navigation.navigate('RHMatch', { idVaga });
   };
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.navigate('CompanyProfile')}>
+        <Ionicons name="arrow-back" size={24} color="#1e293b" />
+      </TouchableOpacity>
+
       <Text style={styles.title}>Vagas da Empresa</Text>
 
       <FlatList
-        data={mockJobs}
-        keyExtractor={(item) => item.id}
+        data={vagas}
+        keyExtractor={(item) => item.idVaga.toString()}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
-          <View style={styles.jobCard}>
+          <TouchableOpacity
+            style={styles.jobCard}
+            onPress={() => handleNavigateToMatch(item.idVaga)} // <- clique no card branco
+          >
             <View>
-              <Text style={styles.jobTitle}>{item.cargo}</Text>
-              <Text style={styles.jobLocation}>{item.local}</Text>
+              <Text style={styles.jobTitle}>{item.titulo}</Text>
+              <Text style={styles.jobLocation}>{item.modalidade}</Text>
             </View>
             <View style={styles.actions}>
-              <TouchableOpacity onPress={() => handleEdit(item.id)}>
+              <TouchableOpacity onPress={() => handleEdit(item.idVaga)}>
                 <Ionicons name="create-outline" size={24} color="#1d4ed8" />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDelete(item.id)}>
+              <TouchableOpacity onPress={() => handleDelete(item.idVaga)}>
                 <Ionicons name="trash-outline" size={24} color="red" />
               </TouchableOpacity>
             </View>
-          </View>
+          </TouchableOpacity>
         )}
       />
 
@@ -84,7 +106,7 @@ const styles = StyleSheet.create({
   },
   jobTitle: { fontSize: 18, fontWeight: '600', marginBottom: 4 },
   jobLocation: { fontSize: 14, color: '#666' },
-  actions: { flexDirection: 'row', gap: 16 },
+  actions: { flexDirection: 'row', gap: 12 },
   addButton: {
     position: 'absolute',
     bottom: 30,

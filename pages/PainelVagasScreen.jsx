@@ -1,41 +1,71 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import NavigationMenu from '../components/NavigationMenu';
-
-const vagas = [
-  {
-    id: '1',
-    titulo: 'Consultor de Mercados para Microempresas',
-    empresa: 'Inova Tech',
-    habilidades: ['Gestão de Projetos', 'Marketing', 'Comunicação'],
-  },
-  {
-    id: '2',
-    titulo: 'Desenvolvedor Frontend',
-    empresa: 'StartUp X',
-    habilidades: ['React', 'UI/UX', 'HTML/CSS'],
-  },
-  {
-    id: '3',
-    titulo: 'Analista de Dados',
-    empresa: 'DataCorp',
-    habilidades: ['Python', 'SQL', 'Power BI'],
-  },
-];
+import { api } from '../service/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function PainelVagasScreen({ navigation }) {
+  const [vagas, setVagas] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchVagas = async () => {
+      try {
+        setLoading(true);
+
+        const techResponse = await api.get('/vaga/usuario/tecnologias');
+        const tecnologias = techResponse.data;
+
+        if (!Array.isArray(tecnologias) || tecnologias.length === 0) {
+          Alert.alert('Nenhuma tecnologia', 'Não foram encontradas tecnologias cadastradas no perfil.');
+          setVagas([]);
+          return;
+        }
+
+        const vagasResponse = await api.post('/vaga/buscar', tecnologias);
+        const todasVagas = vagasResponse.data;
+
+        const usuarioId = await AsyncStorage.getItem('userId');
+        const candidaturasResponse = await api.get(`/vaga/usuario/${usuarioId}`);
+        const vagasCandidatadas = candidaturasResponse.data;
+
+        const vagasFiltradas = todasVagas.filter(
+          vaga => !vagasCandidatadas.includes(vaga.idVaga)
+        );
+
+        const vagasFormatadas = vagasFiltradas.map(vaga => ({
+          id: vaga.idVaga,
+          titulo: vaga.tituloVaga,
+          empresa: vaga.nomeEmpresa,
+          habilidades: vaga.tecnologias,
+        }));
+
+        setVagas(vagasFormatadas);
+      } catch (error) {
+        console.error('Erro ao buscar vagas:', error);
+        Alert.alert('Erro', 'Não foi possível carregar as vagas.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVagas();
+  }, []);
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.backButton}
-        onPress={() => navigation.navigate('Profile')}
+        onPress={() => navigation.goBack()}
       >
         <Ionicons name="arrow-back" size={24} color="#1d4ed8" />
         <Text style={styles.backText}>Voltar</Text>
@@ -43,47 +73,52 @@ export default function PainelVagasScreen({ navigation }) {
 
       <Text style={styles.title}>Painel de Vagas</Text>
 
-      <FlatList
-        data={vagas}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.titulo}>
-              <Ionicons name="briefcase-outline" size={18} color="#1d4ed8" />{' '}
-              {item.titulo}
-            </Text>
-            <Text style={styles.empresa}>{item.empresa}</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#1d4ed8" />
+      ) : (
+        <FlatList
+          data={vagas}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <Text style={styles.titulo}>
+                <Ionicons name="briefcase-outline" size={18} color="#1d4ed8" /> {item.titulo}
+              </Text>
+              <Text style={styles.empresa}>{item.empresa}</Text>
 
-            <View style={styles.skills}>
-              {item.habilidades.map((hab, i) => (
-                <Text key={i} style={styles.skill}>
-                  {hab}
-                </Text>
-              ))}
+              <View style={styles.skills}>
+                {item.habilidades.map((hab, i) => (
+                  <Text key={i} style={styles.skill}>
+                    {hab}
+                  </Text>
+                ))}
+              </View>
+
+              <View style={styles.buttonsRow}>
+                <TouchableOpacity
+                  style={styles.matchButton}
+                  onPress={() => navigation.navigate('JobMatch', {vagaId: item.id})}
+                >
+                  <Text style={styles.matchButtonText}>Match</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.linkButton}
+                  onPress={() => navigation.navigate('DetalhesVaga', { vagaId: item.id })}
+                >
+                  <Text style={styles.linkText}>Ver detalhes</Text>
+                </TouchableOpacity>
+              </View>
             </View>
+          )}
+        />
+      )}
 
-            <View style={styles.buttonsRow}>
-              <TouchableOpacity
-                style={styles.matchButton}
-                onPress={() => navigation.navigate('JobMatch')}
-              >
-                <Text style={styles.matchButtonText}>Match</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.linkButton}
-                onPress={() => navigation.navigate('DetalhesVaga', { id: item.id })}
-              >
-                <Text style={styles.linkText}>Ver detalhes</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-      />
       <NavigationMenu />
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#eef3f9', padding: 20 },

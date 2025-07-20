@@ -3,51 +3,53 @@ import { View, ScrollView, StyleSheet, Text, ActivityIndicator, Alert } from 're
 import NavigationMenu from '../components/NavigationMenu';
 import JobCard from '../components/JobCard';
 import { api } from '../service/api'; // Assumindo que você tenha axios configurado aqui
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const SuggestedJobsScreen = ({ navigation }) => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        setLoading(true);
+useEffect(() => {
+  const fetchJobs = async () => {
+    try {
+      setLoading(true);
 
-        
-        const techResponse = await api.get('/vaga/usuario/tecnologias');
-        const tecnologias = techResponse.data;
+      const techResponse = await api.get('/vaga/usuario/tecnologias');
+      const tecnologias = techResponse.data;
 
-        if (!Array.isArray(tecnologias) || tecnologias.length === 0) {
-          Alert.alert('Nenhuma tecnologia', 'Não foram encontradas tecnologias cadastradas no perfil.');
-          setJobs([]);
-          setLoading(false);
-          return;
-        }
-
-       
-        const vagasResponse = await api.post('/vaga/buscar', tecnologias);
-        const vagas = vagasResponse.data;
-
-        
-        const formattedJobs = vagas.map(vaga => ({
-  id: vaga.idVaga,
-  title: vaga.tituloVaga,       
-  company: vaga.nomeEmpresa,
-  skills: vaga.tecnologias,
-}));
-
-
-        setJobs(formattedJobs);
-      } catch (error) {
-        console.error('Erro ao buscar vagas sugeridas:', error);
-        Alert.alert('Erro', 'Não foi possível carregar as vagas sugeridas.');
-      } finally {
-        setLoading(false);
+      if (!Array.isArray(tecnologias) || tecnologias.length === 0) {
+        Alert.alert('Nenhuma tecnologia', 'Não foram encontradas tecnologias cadastradas no perfil.');
+        setJobs([]);
+        return;
       }
-    };
 
-    fetchJobs();
-  }, []);
+      const vagasResponse = await api.post('/vaga/buscar', tecnologias);
+      const todasVagas = vagasResponse.data;
+      const usuarioId = await AsyncStorage.getItem('userId');
+      const candidaturasResponse = await api.get(`/vaga/usuario/${usuarioId}`);
+      const vagasCandidatadas = candidaturasResponse.data; 
+
+      const vagasFiltradas = todasVagas.filter(vaga => !vagasCandidatadas.includes(vaga.idVaga));
+
+
+      const formattedJobs = vagasFiltradas.map(vaga => ({
+        id: vaga.idVaga,
+        title: vaga.tituloVaga,
+        company: vaga.nomeEmpresa,
+        skills: vaga.tecnologias,
+      }));
+
+      setJobs(formattedJobs);
+    } catch (error) {
+      console.error('Erro ao buscar vagas sugeridas:', error);
+      Alert.alert('Erro', 'Não foi possível carregar as vagas sugeridas.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchJobs();
+}, []);
+
 
   return (
     <View style={styles.mainContainer}>

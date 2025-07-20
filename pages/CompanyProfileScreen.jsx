@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,16 +6,46 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import NavigationMenu from '../components/NavigationMenu';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { api } from '../service/api';
 
 export default function CompanyProfileScreen({ navigation }) {
+  const [empresa, setEmpresa] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const buscarEmpresa = async () => {
+      try {
+        const id = await AsyncStorage.getItem('userId');
+        const response = await api.get(`/usuario/usuarios/${id}`);
+        setEmpresa(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar dados da empresa:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    buscarEmpresa();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#1d4ed8" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {/* Header com botão de menu */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+        <TouchableOpacity onPress={() => navigation.navigate('SettingsCompany')}>
           <Ionicons name="menu" size={28} color="#1d4ed8" />
         </TouchableOpacity>
       </View>
@@ -24,11 +54,13 @@ export default function CompanyProfileScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.profileHeader}>
           <Image
-            source={{ uri: 'https://i.imgur.com/V9gTjFh.png' }}
+            source={
+              { uri: 'https://i.imgur.com/V9gTjFh.png' }
+            }
             style={styles.avatar}
           />
-          <Text style={styles.companyName}>Inova Tech</Text>
-          <Text style={styles.subtitle}>Inovação que transforma o agora</Text>
+          <Text style={styles.companyName}>{empresa?.nome || 'Empresa'}</Text>
+          <Text style={styles.subtitle}>{empresa?.profissao || 'Slogan não informado'}</Text>
 
           <TouchableOpacity
             style={styles.viewJobsButton}
@@ -41,11 +73,7 @@ export default function CompanyProfileScreen({ navigation }) {
         <View style={styles.grayDescriptionBox}>
           <Text style={styles.descriptionTitle}>Sobre a empresa</Text>
           <Text style={styles.descriptionText}>
-            Inova Tech é uma startup especializada em soluções digitais inteligentes
-            para micro e pequenas empresas. Atuamos com consultoria tecnológica,
-            criação de sistemas personalizados e transformação digital acessível,
-            ajudando empreendedores a se destacarem em um mercado competitivo por
-            meio da inovação.
+            {empresa?.bio || 'Descrição não disponível.'}
           </Text>
         </View>
       </ScrollView>
@@ -59,6 +87,12 @@ export default function CompanyProfileScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#EEF3F9',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#EEF3F9',
   },
   header: {

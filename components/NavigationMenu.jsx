@@ -3,10 +3,38 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState, useEffect } from 'react';
 
 const NavigationMenu = ({ activeTab }) => {
   const navigation = useNavigation();
-  
+  const [tipoUsuario, setTipoUsuario] = useState(null);
+
+  useEffect(() => {
+    const fetchTipo = async () => {
+      const tipo = await AsyncStorage.getItem('tipoUsuario');
+      setTipoUsuario(tipo);
+    };
+    fetchTipo();
+  }, []);
+
+  const handleNavigateToProfile = () => {
+    if (tipoUsuario === 'EMPRESA') {
+      navigation.navigate('CompanyProfile');
+    } else {
+      navigation.navigate('Profile');
+    }
+  };
+
+  const handleNavigateToVaga = () => {
+    if (tipoUsuario === 'EMPRESA') {
+      navigation.navigate('CompanyJobs');
+    } else {
+      navigation.navigate('PainelVagas');
+    }
+  };
+
+
   return (
     <LinearGradient 
       colors={['#0f172a', '#1d4ed8']} 
@@ -40,7 +68,7 @@ const NavigationMenu = ({ activeTab }) => {
 
       <TouchableOpacity 
         style={styles.tab} 
-        onPress={() => navigation.navigate('SuggestedJobs')}
+        onPress={handleNavigateToVaga}
       >
         <MaterialIcons 
           name={activeTab === 'jobs' ? 'work' : 'work-outline'} 
@@ -52,7 +80,8 @@ const NavigationMenu = ({ activeTab }) => {
 
       <TouchableOpacity 
         style={styles.tab} 
-        onPress={() => navigation.navigate('Profile')}
+        onPress={handleNavigateToProfile}
+        disabled={!tipoUsuario} // evita clicar antes de carregar
       >
         <FontAwesome 
           name={activeTab === 'profile' ? 'user' : 'user-o'} 

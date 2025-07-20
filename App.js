@@ -24,8 +24,9 @@ import NotificationScreen from './pages/NotificationScreen';
 import CriarVagaScreen from './pages/CriarVagaScreen';
 import SettingsScreen from './pages/SettingsScreen';
 import DetalhesVagaScreen from './pages/DetalhesVagaScreen';
-
-
+import CompanyJobsScreen from './pages/CompanyJobsScreen';
+import SettingsCompanyScreen from './pages/SettingsCompanyScreen';
+import EditVagaScreen from './pages/EditVagaScreen';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -52,8 +53,11 @@ export default function App() {
         <Stack.Screen name="CriarVaga" component={CriarVagaScreen} />
         <Stack.Screen name="Notification" component={NotificationScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="SettingsCompany" component={SettingsCompanyScreen} />
         <Stack.Screen name="PainelVagas" component={PainelVagasScreen} />
         <Stack.Screen name="DetalhesVaga" component={DetalhesVagaScreen} />
+        <Stack.Screen name="CompanyJobs" component={CompanyJobsScreen} /> 
+        <Stack.Screen name="EditVaga" component={EditVagaScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

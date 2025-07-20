@@ -5,26 +5,65 @@ import {
   TextInput, 
   StyleSheet, 
   ScrollView, 
-  TouchableOpacity 
+  TouchableOpacity,
+  Alert
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { api } from '../service/api'; // ajuste o caminho conforme seu projeto
 
-const CriarVagaScreen = () => {
+const CriarVagaScreen = ({ navigation }) => {
   const [formData, setFormData] = useState({
     cargo: '',
     empresa: '',
     descricao: '',
     localizacao: '',
     turno: '',
-    habilidades: ''
+    habilidades: [],
   });
+
+  const [techInput, setTechInput] = useState('');
 
   const handleChange = (name, value) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
-    console.log('Vaga publicada:', formData);
-    // Lógica para publicar a vaga
+  const addTech = () => {
+    const tech = techInput.trim();
+    if (tech && !formData.habilidades.includes(tech)) {
+      setFormData(prev => ({
+        ...prev,
+        habilidades: [...prev.habilidades, tech],
+      }));
+      setTechInput('');
+    }
+  };
+
+  const removeTech = (techToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      habilidades: prev.habilidades.filter(tech => tech !== techToRemove),
+    }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const payload = {
+        titulo: formData.cargo,
+        descricao: formData.descricao,
+        areaAtuacao: formData.empresa,
+        tecnologias: formData.habilidades,
+        localizacao: formData.localizacao,
+        turno: formData.turno,
+      };
+
+      const response = await api.post('/vaga/criar', payload);
+      
+      Alert.alert('Sucesso', 'Vaga publicada com sucesso!');
+      navigation.navigate('CompanyJobs');
+    } catch (error) {
+      console.error('Erro ao criar vaga:', error);
+      Alert.alert('Erro', 'Não foi possível criar a vaga.');
+    }
   };
 
   return (
@@ -33,6 +72,9 @@ const CriarVagaScreen = () => {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="#1e293b" />
+        </TouchableOpacity>
         <Text style={styles.header}>Criar Nova Vaga</Text>
         
         <View style={styles.formGroup}>
@@ -46,10 +88,10 @@ const CriarVagaScreen = () => {
         </View>
 
         <View style={styles.formGroup}>
-          <Text style={styles.label}>Empresa*</Text>
+          <Text style={styles.label}>Área de Atuação*</Text>
           <TextInput
             style={styles.input}
-            placeholder="Ex: Inova Tech"
+            placeholder="Ex: Tecnologia, Design, etc."
             value={formData.empresa}
             onChangeText={(text) => handleChange('empresa', text)}
           />
@@ -87,16 +129,35 @@ const CriarVagaScreen = () => {
           />
         </View>
 
+        {/* Campo para adicionar tecnologias */}
         <View style={styles.formGroup}>
           <Text style={styles.label}>Habilidades Necessárias*</Text>
-          <TextInput
-            style={[styles.input, styles.textarea]}
-            placeholder="Liste as habilidades e requisitos técnicos..."
-            multiline
-            numberOfLines={4}
-            value={formData.habilidades}
-            onChangeText={(text) => handleChange('habilidades', text)}
-          />
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <TextInput
+              style={[styles.input, { flex: 1 }]}
+              placeholder="Digite uma tecnologia"
+              value={techInput}
+              onChangeText={setTechInput}
+              onSubmitEditing={addTech}
+              returnKeyType="done"
+            />
+            <TouchableOpacity onPress={addTech} style={styles.addTechButton}>
+              <Text style={styles.addTechButtonText}>Adicionar</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.tagsContainer}>
+            {formData.habilidades.map((tech, i) => (
+              <TouchableOpacity
+                key={i}
+                style={styles.tag}
+                onPress={() => removeTech(tech)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.tagText}>{tech} ×</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
 
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
@@ -106,6 +167,7 @@ const CriarVagaScreen = () => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -145,6 +207,34 @@ const styles = StyleSheet.create({
   textarea: {
     height: 120,
     textAlignVertical: 'top',
+  },
+  addTechButton: {
+    backgroundColor: '#2A4BA0',
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    marginLeft: 8,
+  },
+  addTechButtonText: {
+    color: '#FFF',
+    fontWeight: '600',
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 12,
+  },
+  tag: {
+    backgroundColor: '#2A4BA0',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  tagText: {
+    color: '#fff',
+    fontWeight: '600',
   },
   submitButton: {
     backgroundColor: '#2A4BA0',
