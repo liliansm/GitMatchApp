@@ -98,7 +98,7 @@ export default function LoginScreen({ navigation }) {
     setLoading(true);
     try {
       const data = await login({ email, senha });
-      console.log('Login bem-sucedido:', data);
+      
 
       if (data.tipoUsuario === 'CANDIDATO') {
         navigation.reset({

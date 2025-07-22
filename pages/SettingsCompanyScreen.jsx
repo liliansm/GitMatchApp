@@ -13,17 +13,48 @@ import {
   FontAwesome5,
 } from '@expo/vector-icons';
 import { logout } from '../service/authService'; 
+import { api } from '../service/api'; // sua instância axios configurada
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export default function SettingsCompanyScreen({ navigation }) {
+
   const handleLogout = () => {
     logout();
     navigation.navigate('Login');
   };
 
-  const handleDeleteAccount = () => {
-    Alert.alert('Confirmação', 'Tem certeza que deseja excluir sua conta?', [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Excluir', style: 'destructive', onPress: () => console.log('Conta excluída') },
-    ]);
+  const handleDeleteAccount = async () => {
+    Alert.alert(
+      'Confirmação',
+      'Tem certeza que deseja excluir sua conta?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: 'Excluir', 
+          style: 'destructive', 
+          onPress: async () => {
+            try {
+              const userId = await AsyncStorage.getItem('userId');
+              if (!userId) {
+                Alert.alert('Erro', 'Usuário não autenticado');
+                return;
+              }
+              await api.delete(`/usuario/delete/${userId}`);
+              Alert.alert('Sucesso', 'Conta excluída com sucesso!');
+              logout();
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+              });
+            } catch (error) {
+              console.error('Erro ao excluir conta:', error.response?.data || error.message);
+              Alert.alert('Erro', 'Não foi possível excluir a conta.');
+            }
+          } 
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   return (

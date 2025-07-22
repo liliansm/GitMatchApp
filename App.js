@@ -27,6 +27,7 @@ import DetalhesVagaScreen from './pages/DetalhesVagaScreen';
 import CompanyJobsScreen from './pages/CompanyJobsScreen';
 import SettingsCompanyScreen from './pages/SettingsCompanyScreen';
 import EditVagaScreen from './pages/EditVagaScreen';
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -58,6 +59,7 @@ export default function App() {
         <Stack.Screen name="DetalhesVaga" component={DetalhesVagaScreen} />
         <Stack.Screen name="CompanyJobs" component={CompanyJobsScreen} /> 
         <Stack.Screen name="EditVaga" component={EditVagaScreen} />
+       
       </Stack.Navigator>
     </NavigationContainer>
   );

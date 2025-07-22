@@ -5,11 +5,12 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Switch,
+  Alert,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import AuthLayout from '../components/AuthLayout';
 import { cadastrar } from '../service/authService';
-import { Alert } from 'react-native';
 
 export default function RegisterScreen({ navigation }) {
   const [form, setForm] = useState({
@@ -18,9 +19,14 @@ export default function RegisterScreen({ navigation }) {
     senha: '',
     confirma: '',
     github: '',
+    cnpj: '',
   });
 
-  const handleChange = (name, value) => setForm({ ...form, [name]: value });
+  const [isEmpresa, setIsEmpresa] = useState(false);
+
+  const handleChange = (name, value) => {
+    setForm({ ...form, [name]: value });
+  };
 
   const handleRegister = async () => {
     if (form.senha !== form.confirma) {
@@ -31,14 +37,16 @@ export default function RegisterScreen({ navigation }) {
       nome: form.nome,
       email: form.email,
       senha: form.senha,
-      tipoUsuario: 'CANDIDATO',
-      githubUsername: form.github,
+      tipoUsuario: isEmpresa ? 'EMPRESA' : 'CANDIDATO',
+      ...(isEmpresa
+        ? { cnpj: form.cnpj }
+        : { githubUsername: form.github }),
     };
 
     try {
       const userData = await cadastrar(payload);
       console.log('Usuário cadastrado:', userData);
-      navigation.navigate('Login'); 
+      navigation.navigate('Login');
     } catch (error) {
       console.error('Erro no cadastro:', error.response?.data || error.message);
       Alert.alert('Erro no cadastro', 'Verifique os dados e tente novamente.');
@@ -50,10 +58,7 @@ export default function RegisterScreen({ navigation }) {
       title="Olá"
       subtitle="Adicione seus dados"
       button={
-        <TouchableOpacity
-          style={styles.entrarButton}
-          onPress={handleRegister}
-        >
+        <TouchableOpacity style={styles.entrarButton} onPress={handleRegister}>
           <Text style={styles.entrarButtonText}>Criar conta</Text>
         </TouchableOpacity>
       }
@@ -63,26 +68,63 @@ export default function RegisterScreen({ navigation }) {
         <Text style={styles.githubText}>Entrar com GitHub</Text>
       </TouchableOpacity>
 
-      {['nome', 'email', 'senha', 'confirma', 'github'].map((field, idx) => (
+      <TextInput
+        placeholder="Nome"
+        style={styles.input}
+        value={form.nome}
+        onChangeText={(val) => handleChange('nome', val)}
+      />
+      <TextInput
+        placeholder="E-mail"
+        style={styles.input}
+        value={form.email}
+        onChangeText={(val) => handleChange('email', val)}
+        keyboardType="email-address"
+      />
+      <TextInput
+        placeholder="Senha"
+        secureTextEntry
+        style={styles.input}
+        value={form.senha}
+        onChangeText={(val) => handleChange('senha', val)}
+      />
+      <TextInput
+        placeholder="Confirme sua senha"
+        secureTextEntry
+        style={styles.input}
+        value={form.confirma}
+        onChangeText={(val) => handleChange('confirma', val)}
+      />
+
+      {/* Campo condicional: GitHub (Candidato) ou CNPJ (Empresa) */}
+      {isEmpresa ? (
         <TextInput
-          key={idx}
-          placeholder={
-            field === 'nome'
-              ? 'Nome'
-              : field === 'email'
-              ? 'E-mail'
-              : field === 'senha'
-              ? 'Senha'
-              : field === 'confirma'
-              ? 'Confirme sua senha'
-              : 'Link do GitHub'
-          }
-          secureTextEntry={field.includes('senha')}
+          placeholder="CNPJ"
           style={styles.input}
-          value={form[field]}
-          onChangeText={(val) => handleChange(field, val)}
+          value={form.cnpj}
+          onChangeText={(val) => handleChange('cnpj', val)}
+          keyboardType="numeric"
         />
-      ))}
+      ) : (
+        <TextInput
+          placeholder="Github Username"
+          style={styles.input}
+          value={form.github}
+          onChangeText={(val) => handleChange('github', val)}
+        />
+      )}
+
+      {/* Switch de tipo de usuário */}
+      <View style={styles.switchContainer}>
+        <Text style={styles.switchTipo}>{isEmpresa ? 'Empresa' : 'Candidato'}</Text>
+        <Switch
+          trackColor={{ false: '#767577', true: '#1d4ed8' }}
+          thumbColor="#f4f3f4"
+          ios_backgroundColor="#3e3e3e"
+          onValueChange={setIsEmpresa}
+          value={isEmpresa}
+        />
+      </View>
 
       <Text style={styles.terms}>
         Eu li e concordo com os{' '}
@@ -120,6 +162,18 @@ const styles = StyleSheet.create({
   githubText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    justifyContent: 'center',
+  },
+  switchTipo: {
+    fontWeight: '700',
+    fontSize: 16,
+    color: '#1d4ed8',
+    marginRight: 12,
   },
   terms: {
     fontSize: 12,

@@ -122,11 +122,11 @@ export default function EditProfileScreen() {
             onChangeText={setBio}
           />
 
-          <Text style={styles.label}>Currículo</Text>
+          {/* <Text style={styles.label}>Currículo</Text>
           <TouchableOpacity style={styles.attachButton} onPress={handleAttachCV}>
             <Ionicons name="attach" size={20} color="#2A4BA0" />
             <Text style={styles.attachButtonText}>Anexar Currículo</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         {successMessage !== '' && (

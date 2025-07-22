@@ -54,7 +54,7 @@ const NavigationMenu = ({ activeTab }) => {
         <Text style={styles.tabText}>Home</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
+      {/* <TouchableOpacity 
         style={styles.tab} 
         onPress={() => navigation.navigate('Notification')}
       >
@@ -64,7 +64,7 @@ const NavigationMenu = ({ activeTab }) => {
           color="#fff" 
         />
         <Text style={styles.tabText}>Notificações</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <TouchableOpacity 
         style={styles.tab} 

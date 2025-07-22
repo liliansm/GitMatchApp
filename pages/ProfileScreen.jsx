@@ -14,6 +14,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '../service/api';
 import { API_BASE_URL } from '../config';
+import { SafeAreaView } from 'react-native';
 
 
 
@@ -54,8 +55,7 @@ export default function ProfileScreen({ navigation }) {
     try {
       const token = await AsyncStorage.getItem('token');
       const userId = await AsyncStorage.getItem('userId');
-      console.log("Token enviado:", token);
-      console.log("User ID enviado:", userId);
+      
       if (!token || !userId) throw new Error('Usuário não autenticado');
 
       const response = await api.get(`/usuarios/${userId}`, {
@@ -102,13 +102,16 @@ export default function ProfileScreen({ navigation }) {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView  style={styles.container}>
+      <SafeAreaView style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Ionicons name="menu" size={28} color="#1d4ed8" />
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
       <ScrollView contentContainerStyle={styles.content}>
+        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+          <Ionicons name="menu" size={28} color="#1d4ed8" />
+        </TouchableOpacity>
         {loading ? (
           <ActivityIndicator size="large" color="#1d4ed8" />
         ) : (
@@ -116,7 +119,7 @@ export default function ProfileScreen({ navigation }) {
         )}
       </ScrollView>
       <NavigationMenu />
-    </View>
+    </SafeAreaView>
   );
 }
 

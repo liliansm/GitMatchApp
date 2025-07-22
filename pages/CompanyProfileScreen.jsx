@@ -49,6 +49,9 @@ export default function CompanyProfileScreen({ navigation }) {
           <Ionicons name="menu" size={28} color="#1d4ed8" />
         </TouchableOpacity>
       </View>
+        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+                  <Ionicons name="menu" size={28} color="#1d4ed8" />
+                </TouchableOpacity>
 
       {/* Conteúdo rolável */}
       <ScrollView contentContainerStyle={styles.scrollContent}>

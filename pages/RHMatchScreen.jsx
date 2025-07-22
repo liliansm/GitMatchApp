@@ -11,6 +11,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { api } from '../service/api';
 import { Ionicons } from '@expo/vector-icons';
+import { Linking, Alert } from 'react-native'; 
 
 export default function RHMatchScreen({ route }) {
   const navigation = useNavigation();
@@ -22,9 +23,9 @@ export default function RHMatchScreen({ route }) {
   useEffect(() => {
     const fetchCandidatos = async () => {
       try {
-        console.log('Buscando candidatos para a vaga:', idVaga);
+        
         const response = await api.get(`/vaga/empresa/candidatosVaga/${idVaga}`);
-        console.log('Dados recebidos:', response.data);
+        
         setCandidatos(response.data.candidatos || []);
       } catch (error) {
         console.error('Erro ao buscar candidatos:', error);
@@ -37,8 +38,27 @@ export default function RHMatchScreen({ route }) {
   }, [idVaga]);
 
   const abrirDetalhes = (candidato) => {
-    navigation.navigate('CandidatoDetalhes', { candidato });
-  };
+  if (!candidato.email) {
+    Alert.alert('Erro', 'Este candidato não possui e-mail disponível.');
+    return;
+  }
+
+  const mailtoUrl = `mailto:${candidato.email}`;
+
+  Linking.canOpenURL(mailtoUrl)
+    .then((supported) => {
+      if (supported) {
+        Linking.openURL(mailtoUrl);
+      } else {
+        Alert.alert('Erro', 'Não foi possível abrir o aplicativo de e-mail.');
+      }
+    })
+    .catch((err) => {
+      console.error('Erro ao tentar abrir e-mail:', err);
+      Alert.alert('Erro', 'Não foi possível abrir o aplicativo de e-mail.');
+    });
+};
+
 
   if (loading) {
     return (
